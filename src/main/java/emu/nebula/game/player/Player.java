@@ -16,11 +16,13 @@ import emu.nebula.game.character.CharacterStorage;
 import emu.nebula.game.formation.FormationManager;
 import emu.nebula.game.inventory.Inventory;
 import emu.nebula.game.mail.Mailbox;
+import emu.nebula.game.story.StoryManager;
 import emu.nebula.game.tower.StarTowerManager;
 import emu.nebula.net.GameSession;
 import emu.nebula.proto.PlayerData.PlayerInfo;
 import emu.nebula.proto.Public.NewbieInfo;
 import emu.nebula.proto.Public.QuestType;
+import emu.nebula.proto.Public.Story;
 import emu.nebula.proto.Public.WorldClass;
 
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -62,6 +64,7 @@ public class Player implements GameDatabaseObject {
     private transient FormationManager formations;
     private transient Mailbox mailbox;
     private transient StarTowerManager starTowerManager;
+    private transient StoryManager storyManager;
     
     @Deprecated // Morphia only
     public Player() {
@@ -257,6 +260,13 @@ public class Player implements GameDatabaseObject {
         } else {
             this.starTowerManager.setPlayer(this);
         }
+        
+        this.storyManager = Nebula.getGameDatabase().getObjectByField(StoryManager.class, "_id", this.getUid());
+        if (this.storyManager == null) {
+            this.storyManager = new StoryManager(this);
+        } else {
+            this.storyManager.setPlayer(this);
+        }
     }
     
     // Proto
@@ -337,6 +347,16 @@ public class Player implements GameDatabaseObject {
         }
         
         acc.addNewbies(NewbieInfo.newInstance().setGroupId(GameConstants.INTRO_GUIDE_ID).setStepId(-1));
+        
+        // Story
+        var story = proto.getMutableStory();
+        
+        for (int storyId : this.getStoryManager().getCompletedStories()) {
+            var storyProto = Story.newInstance()
+                    .setIdx(storyId);
+            
+            story.addStories(storyProto);
+        }
 
         //
         proto.addBoard(410301);
@@ -351,7 +371,6 @@ public class Player implements GameDatabaseObject {
         proto.getMutableQuests();
         proto.getMutableAgent();
         proto.getMutablePhone();
-        proto.getMutableStory();
         
         return proto;
     }

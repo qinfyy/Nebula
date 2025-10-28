@@ -76,7 +76,7 @@ public class ItemParamMap extends Int2IntOpenHashMap {
                 .map(e -> ItemTpl.newInstance().setTid(e.getIntKey()).setQty(e.getIntValue()));
     }
     
-    // Proto
+    // Helpers
 
     public static ItemParamMap fromTemplates(RepeatedMessage<ItemTpl> items) {
         var map = new ItemParamMap();
@@ -93,6 +93,16 @@ public class ItemParamMap extends Int2IntOpenHashMap {
         
         for (var template : items) {
             map.add(template.getTid(), template.getQty());
+        }
+        
+        return map;
+    }
+
+    public static ItemParamMap fromItemParams(List<ItemParam> items) {
+        var map = new ItemParamMap();
+        
+        for (var template : items) {
+            map.add(template.getId(), template.getCount());
         }
         
         return map;
