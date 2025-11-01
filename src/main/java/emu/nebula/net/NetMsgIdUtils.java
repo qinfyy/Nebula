@@ -38,7 +38,6 @@ public class NetMsgIdUtils {
         return msgIdMap.getOrDefault(msgId, "UNKNOWN");
     }
 
-    @SuppressWarnings("unused")
     public static void dumpPacketIds() {
         try (FileWriter writer = new FileWriter("./MsgIds_" + GameConstants.VERSION + ".json")) {
             // Create sorted tree map

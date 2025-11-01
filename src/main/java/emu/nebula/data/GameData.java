@@ -50,6 +50,9 @@ public class GameData {
     @Getter private static DataTable<CharGemInstanceDef> CharGemInstanceDataTable = new DataTable<>();
     @Getter private static DataTable<WeekBossLevelDef> WeekBossLevelDataTable = new DataTable<>();
     
+    @Getter private static DataTable<GachaDef> GachaDataTable = new DataTable<>();
+    @Getter private static DataTable<GachaStorageDef> GachaStorageDataTable = new DataTable<>();
+    
     @Getter private static DataTable<WorldClassDef> WorldClassDataTable = new DataTable<>();
     @Getter private static DataTable<GuideGroupDef> GuideGroupDataTable = new DataTable<>();
     @Getter private static DataTable<HandbookDef> HandbookDataTable = new DataTable<>();

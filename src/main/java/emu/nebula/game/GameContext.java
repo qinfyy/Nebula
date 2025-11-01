@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import emu.nebula.game.gacha.GachaModule;
 import emu.nebula.game.player.PlayerModule;
 import emu.nebula.net.GameSession;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -16,13 +17,16 @@ public class GameContext {
     
     // Modules
     private final PlayerModule playerModule;
+    private final GachaModule gachaModule;
     
     // Cleanup thread
     private final Timer cleanupTimer;
     
     public GameContext() {
         this.sessions = new Object2ObjectOpenHashMap<>();
+        
         this.playerModule = new PlayerModule(this);
+        this.gachaModule = new GachaModule(this);
         
         this.cleanupTimer = new Timer();
         this.cleanupTimer.scheduleAtFixedRate(new CleanupTask(this), 0, TimeUnit.SECONDS.toMillis(60));

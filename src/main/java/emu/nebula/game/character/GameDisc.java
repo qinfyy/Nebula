@@ -130,7 +130,7 @@ public class GameDisc implements GameDatabaseObject {
         int exp = 0;
         
         // Check if item is an exp item
-        for (var entry : params.getEntrySet()) {
+        for (var entry : params.entries()) {
             var data = GameData.getDiscItemExpDataTable().get(entry.getIntKey());
             if (data == null) return null;
             

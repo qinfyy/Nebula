@@ -207,7 +207,7 @@ public class Inventory extends PlayerManager {
         }
         
         // Add items
-        for (var param : params.getEntrySet()) {
+        for (var param : params.entries()) {
             this.addItem(param.getIntKey(), param.getIntValue(), changes);
         }
         
@@ -242,7 +242,7 @@ public class Inventory extends PlayerManager {
         }
         
         // Remove items
-        for (var param : params.getEntrySet()) {
+        for (var param : params.entries()) {
             this.removeItem(param.getIntKey(), param.getIntValue(), changes);
         }
         
@@ -293,7 +293,7 @@ public class Inventory extends PlayerManager {
     public synchronized boolean verifyItems(ItemParamMap params) {
         boolean hasItems = true;
         
-        for (var param : params.getEntrySet()) {
+        for (var param : params.entries()) {
             hasItems = this.verifyItem(param.getIntKey(), param.getIntValue());
             
             if (!hasItems) {

@@ -7,15 +7,13 @@ import java.util.stream.Stream;
 import emu.nebula.proto.Public.Item;
 import emu.nebula.proto.Public.ItemInfo;
 import emu.nebula.proto.Public.ItemTpl;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+
+import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
+
 import us.hebi.quickbuf.RepeatedMessage;
 
-public class ItemParamMap extends Int2IntOpenHashMap {
+public class ItemParamMap extends Int2IntLinkedOpenHashMap {
     private static final long serialVersionUID = -4186524272780523459L;
-
-    public FastEntrySet entries() {
-        return this.int2IntEntrySet();
-    }
     
     @Override @Deprecated
     public int addTo(int itemId, int count) {
@@ -55,9 +53,7 @@ public class ItemParamMap extends Int2IntOpenHashMap {
         return params;
     }
     
-    //
-    
-    public FastEntrySet getEntrySet() {
+    public FastEntrySet entries() {
         return this.int2IntEntrySet();
     }
     
@@ -74,13 +70,13 @@ public class ItemParamMap extends Int2IntOpenHashMap {
     }
 
     public Stream<ItemTpl> toItemTemplateStream() {
-        return getEntrySet()
+        return entries()
                 .stream()
                 .map(e -> ItemTpl.newInstance().setTid(e.getIntKey()).setQty(e.getIntValue()));
     }
     
     public Stream<Item> toItemProtoStream() {
-        return getEntrySet()
+        return entries()
                 .stream()
                 .map(e -> Item.newInstance().setTid(e.getIntKey()).setQty(e.getIntValue()));
     }

@@ -14,6 +14,7 @@ import emu.nebula.database.GameDatabaseObject;
 import emu.nebula.game.account.Account;
 import emu.nebula.game.character.CharacterStorage;
 import emu.nebula.game.formation.FormationManager;
+import emu.nebula.game.gacha.GachaManager;
 import emu.nebula.game.instance.InstanceManager;
 import emu.nebula.game.inventory.Inventory;
 import emu.nebula.game.mail.Mailbox;
@@ -66,6 +67,7 @@ public class Player implements GameDatabaseObject {
     // Managers
     private final transient CharacterStorage characters;
     private final transient Inventory inventory;
+    private transient GachaManager gachaManager;
     
     // Referenced data
     private transient FormationManager formations;
@@ -79,6 +81,7 @@ public class Player implements GameDatabaseObject {
         this.sessions = new HashSet<>();
         this.characters = new CharacterStorage(this);
         this.inventory = new Inventory(this);
+        this.gachaManager = new GachaManager(this);
     }
     
     public Player(Account account, String name, boolean gender) {
