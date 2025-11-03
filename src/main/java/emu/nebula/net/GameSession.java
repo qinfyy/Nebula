@@ -167,13 +167,44 @@ public class GameSession {
             this.getPlayer().getMailbox().clearNewState();
             
             // Send mail state notify
-            byte[] nextPackage = PacketHelper.encodeMsg(
-                    NetMsgId.mail_state_notify, 
-                    MailState.newInstance().setNew(true)
+            this.getPlayer().addNextPackage(
+                NetMsgId.mail_state_notify, 
+                MailState.newInstance().setNew(true)
             );
+        }
+        
+        // Set next package
+        if (this.getPlayer().getNextPackages().size() > 0) {
+            // Set current package
+            NetMsgPacket curPacket = null;
             
-            // Set via reflection
-            PacketHelper.setNextPackage(proto, nextPackage);
+            // Chain link next packages
+            while (getPlayer().getNextPackages().size() > 0) {
+                // Make sure the current packet has a nextPackage field
+                if (curPacket != null && !PacketHelper.hasNextPackageMethod(curPacket.getProto())) {
+                    break;
+                }
+                
+                // Get current package
+                var nextPacket = getPlayer().getNextPackages().pop();
+                
+                // Set cur packet if its null
+                if (curPacket == null) {
+                    curPacket = nextPacket;
+                    continue;
+                }
+                
+                // Set next package
+                PacketHelper.setNextPackage(nextPacket.getProto(), curPacket.toByteArray());
+                
+                // Update next packet
+                curPacket = nextPacket;
+            }
+            
+            // Set next package of current proto via reflection
+            if (curPacket != null) {
+                PacketHelper.setNextPackage(proto, curPacket.toByteArray());
+            }
         }
     }
 }

@@ -14,6 +14,8 @@ import us.hebi.quickbuf.ProtoSink;
 public class PacketHelper {
     private static Object2IntMap<Class<?>> methodIndexCache = new Object2IntOpenHashMap<>();
     
+    // Next packages
+    
     public static void cacheProtos() {
         var classes = new Reflections(Nebula.class.getPackage().getName()).getSubTypesOf(ProtoMessage.class);
         

@@ -2,6 +2,7 @@ package emu.nebula.game.player;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
@@ -21,6 +22,7 @@ import emu.nebula.game.mail.Mailbox;
 import emu.nebula.game.story.StoryManager;
 import emu.nebula.game.tower.StarTowerManager;
 import emu.nebula.net.GameSession;
+import emu.nebula.net.NetMsgPacket;
 import emu.nebula.proto.PlayerData.DictionaryEntry;
 import emu.nebula.proto.PlayerData.DictionaryTab;
 import emu.nebula.proto.PlayerData.PlayerInfo;
@@ -32,6 +34,7 @@ import emu.nebula.proto.Public.WorldClass;
 import emu.nebula.proto.Public.Title;
 
 import lombok.Getter;
+import us.hebi.quickbuf.ProtoMessage;
 import us.hebi.quickbuf.RepeatedInt;
 
 @Getter
@@ -72,11 +75,16 @@ public class Player implements GameDatabaseObject {
     private transient InstanceManager instanceManager;
     private transient StoryManager storyManager;
     
+    // Next packages
+    private transient Stack<NetMsgPacket> nextPackages;
+    
     @Deprecated // Morphia only
     public Player() {
         this.sessions = new HashSet<>();
         this.characters = new CharacterStorage(this);
         this.gachaManager = new GachaManager(this);
+        
+        this.nextPackages = new Stack<>();
     }
     
     public Player(Account account, String name, boolean gender) {
@@ -428,6 +436,12 @@ public class Player implements GameDatabaseObject {
         this.starTowerManager = this.loadManagerFromDatabase(StarTowerManager.class);
         this.instanceManager = this.loadManagerFromDatabase(InstanceManager.class);
         this.storyManager = this.loadManagerFromDatabase(StoryManager.class);
+    }
+    
+    // Next packages
+    
+    public void addNextPackage(int msgId, ProtoMessage<?> proto) {
+        this.getNextPackages().add(new NetMsgPacket(msgId, proto));
     }
     
     // Proto
