@@ -16,15 +16,15 @@ public class HandlerMallShopOrderReq extends NetHandler {
         var req = MallShopOrderReq.parseFrom(message);
         
         // Get package data
-        var data = GameData.getMallPackageDataTable().get(req.getId().hashCode());
+        var data = GameData.getMallShopDataTable().get(req.getId().hashCode());
         if (data == null) {
             return session.encodeMsg(NetMsgId.mall_shop_order_failed_ack);
         }
         
         // Buy items
         var change = session.getPlayer().getInventory().buyItem(
-                data.getCurrencyItemId(),
-                data.getCurrencyItemQty(),
+                data.getExchangeItemId(),
+                data.getExchangeItemQty(),
                 data.getProducts(),
                 req.getQty()
         );
