@@ -485,6 +485,7 @@ public class Player implements GameDatabaseObject {
     public PlayerInfo toProto() {
         PlayerInfo proto = PlayerInfo.newInstance()
                 .setServerTs(Nebula.getCurrentTime())
+                .setDailyShopRewardStatus(this.getQuestManager().hasDailyReward())
                 .setAchievements(new byte[64]);
         
         var acc = proto.getMutableAcc()

@@ -19,6 +19,7 @@ import emu.nebula.util.Bitset;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
+import lombok.AccessLevel;
 import lombok.Getter;
 
 @Getter
@@ -37,6 +38,9 @@ public class QuestManager extends PlayerManager implements GameDatabaseObject {
     // Level rewards
     private Bitset levelRewards;
     
+    @Getter(AccessLevel.NONE)
+    private boolean hasDailyReward;
+    
     @Deprecated // Morphia only
     public QuestManager() {
         
@@ -48,10 +52,15 @@ public class QuestManager extends PlayerManager implements GameDatabaseObject {
         this.claimedActiveIds = new IntOpenHashSet();
         this.quests = new HashMap<>();
         this.levelRewards = new Bitset();
+        this.hasDailyReward = true;
         
         this.resetDailyQuests();
         
         this.save();
+    }
+    
+    public boolean hasDailyReward() {
+        return this.hasDailyReward;
     }
     
     public void saveLevelRewards() {
@@ -74,6 +83,8 @@ public class QuestManager extends PlayerManager implements GameDatabaseObject {
         // Reset activity
         this.activity = 0;
         this.claimedActiveIds.clear();
+        
+        this.hasDailyReward = true;
         
         // Persist to database
         this.save();
@@ -251,5 +262,28 @@ public class QuestManager extends PlayerManager implements GameDatabaseObject {
                 NetMsgId.quest_change_notify, 
                 quest.toProto()
         );
+    }
+    
+    // Daily reward
+    
+    public PlayerChangeInfo claimDailyReward() {
+        // Sanity check
+        if (!this.hasDailyReward) {
+            return null;
+        }
+        
+        // Daily shop reward
+        // TODO randomize
+        var change = this.getPlayer().getInventory().addItem(1, 8888);
+        
+        // Set and update in database
+        this.hasDailyReward = false;
+        Nebula.getGameDatabase().update(this, this.getUid(), "hasDailyReward", this.hasDailyReward);
+        
+        // Trigger quest
+        this.triggerQuest(QuestCondType.DailyShopReceiveShopTotal, 1);
+        
+        // Success
+        return change.setSuccess(true);
     }
 }
