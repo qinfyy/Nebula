@@ -618,7 +618,7 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
         return change.setSuccess(true);
     }
     
-    public PlayerChangeInfo useItem(int id, int count, PlayerChangeInfo change) {
+    public PlayerChangeInfo useItem(int id, int count, int selectId, PlayerChangeInfo change) {
         // Player change info
         if (change == null) {
             change = new PlayerChangeInfo();
@@ -643,6 +643,21 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
             case 2 -> {
                 // Add items
                 this.addItems(data.getUseParams(), change);
+                
+                // Success
+                success = true;
+            }
+            case 3 -> {
+                // Selected item
+                int selectCount = data.getUseParams().get(selectId);
+                
+                if (selectCount <= 0) {
+                    return change;
+                }
+                
+                // Add selected item
+                this.addItem(selectId, selectCount, change);
+                
                 // Success
                 success = true;
             }

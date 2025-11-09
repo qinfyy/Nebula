@@ -25,7 +25,12 @@ public class HandlerItemUseReq extends NetHandler {
         
         // Use item
         for (var param : req.getUse().getList()) {
-            session.getPlayer().getInventory().useItem(param.getTid(), param.getQty(), change);
+            session.getPlayer().getInventory().useItem(param.getTid(), param.getQty(), 0, change);
+        }
+        
+        // Pick item
+        for (var param : req.getPick().getList()) {
+            session.getPlayer().getInventory().useItem(param.getTid(), param.getQty(), param.getSelectTid(), change);
         }
         
         // Encode and send
