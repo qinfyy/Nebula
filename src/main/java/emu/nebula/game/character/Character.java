@@ -34,6 +34,7 @@ import emu.nebula.proto.PublicStarTower.StarTowerCharGem;
 import emu.nebula.util.Bitset;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import lombok.Getter;
+import us.hebi.quickbuf.RepeatedInt;
 
 @Getter
 @Entity(value = "characters", useDiscriminator = false)
@@ -394,7 +395,28 @@ public class Character implements GameDatabaseObject {
         return true;
     }
     
-    public CharacterGem getGem(CharacterGemPreset preset, int slotId) {
+    public boolean renameGemPreset(int index, String name) {
+        // Sanity check
+        if (index < 0 || index >= GameConstants.CHARACTER_MAX_GEM_PRESETS) {
+            return false;
+        }
+        
+        if (name == null || name.length() > 32) {
+            return false;
+        }
+        
+        // Rename preset
+        var preset = this.getGemPreset(index);
+        preset.setName(name);
+        
+        // Update to database
+        this.save();
+        
+        // Success
+        return true;
+    }
+    
+    public CharacterGem getGemFromPreset(CharacterGemPreset preset, int slotId) {
         // Get gem index
         int gemIndex = preset.getGemIndex(slotId - 1);
         
@@ -411,6 +433,19 @@ public class Character implements GameDatabaseObject {
         
         // Get gem from the slot using preset index
         return slot.getGem(gemIndex);
+    }
+    
+    public CharacterGem getGemFromSlot(int slotId, int gemIndex) {
+        // Check if gem slot exists
+        if (!this.hasGemSlot(slotId)) {
+            return null;
+        }
+        
+        // Get gem from gem slot
+        var slot = this.getGemSlot(slotId);
+        var gem = slot.getGem(gemIndex);
+        
+        return gem;
     }
     
     public boolean equipGem(int presetIndex, int slotId, int gemIndex) {
@@ -461,6 +496,21 @@ public class Character implements GameDatabaseObject {
         
         return this.gemSlots[index];
     }
+    
+    public boolean lockGem(int slotId, int gemIndex, boolean lock) {
+        // Get gem from slot
+        var gem = this.getGemFromSlot(slotId, gemIndex);
+        if (gem == null) return false;
+        
+        // Lock
+        gem.setLocked(lock);
+        
+        // Save to database
+        this.save();
+        
+        // Success
+        return true;
+    }
 
     public synchronized PlayerChangeInfo generateGem(int slotId) {
         // Get gem slot
@@ -506,6 +556,59 @@ public class Character implements GameDatabaseObject {
         
         // Success
         return change;
+    }
+    
+    public synchronized PlayerChangeInfo refreshGem(int slotId, int gemIndex, RepeatedInt lockedAttributes) {
+        // Get gem from slot
+        var gem = this.getGemFromSlot(slotId, gemIndex);
+        if (gem == null) return null;
+        
+        // Get gem data
+        var gemData = this.getData().getCharGemData(slotId);
+        var gemControl = gemData.getControlData();
+        
+        // Check character level
+        if (this.getLevel() < gemControl.getUnlockLevel()) {
+            return null;
+        }
+        
+        // Make sure the player has the materials to craft the emblem
+        if (!getPlayer().getInventory().hasItem(gemData.getRefreshCostTid(), gemControl.getRefreshCostQty())) {
+            return null;
+        }
+        
+        // Generate attributes and create gem
+        var attributes = gemControl.generateAttributes();
+        gem.setNewAttributes(attributes);
+        
+        // Save to database
+        this.save();
+        
+        // Consume materials
+        var change = getPlayer().getInventory().removeItem(gemData.getRefreshCostTid(), gemControl.getRefreshCostQty());
+        
+        // Set change info extra info
+        change.setExtraData(gem);
+        
+        // Success
+        return change;
+    }
+    
+    public boolean replaceGemAttributes(int slotId, int gemIndex) {
+        // Get gem from slot
+        var gem = this.getGemFromSlot(slotId, gemIndex);
+        if (gem == null) return false;
+        
+        // Replace attributes with altered ones
+        boolean success = gem.replaceAttributes();
+        
+        // Save to database
+        if (success) {
+            this.save();
+        }
+        
+        // Success
+        return success;
     }
     
     // Proto
@@ -566,7 +669,7 @@ public class Character implements GameDatabaseObject {
         var preset = this.getCurrentGemPreset();
         
         for (int i = 1; i <= preset.getLength(); i++) {
-            var gem = this.getGem(preset, i);
+            var gem = this.getGemFromPreset(preset, i);
             var info = StarTowerCharGem.newInstance()
                     .setSlotId(i);
             

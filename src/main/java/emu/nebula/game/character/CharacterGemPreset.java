@@ -19,6 +19,10 @@ public class CharacterGemPreset {
         this.gems = new int[] {-1, -1, -1};
     }
     
+    public void setName(String name) {
+        this.name = name;
+    }
+    
     public int getLength() {
         return this.getGems().length;
     }
