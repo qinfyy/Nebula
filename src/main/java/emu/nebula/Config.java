@@ -22,8 +22,8 @@ public class Config {
     public ServerRates serverRates = new ServerRates();
     public LogOptions logOptions = new LogOptions();
 
+    public int customDataVersion = 0;
     public String resourceDir = "./resources";
-    public String dataDir = "./data";
     public String patchListPath = "./patchlist.json";
 
     @Getter

@@ -63,7 +63,7 @@ public class HttpServer {
     // Patch list
     
     public long getDataVersion() {
-        return getPatchlist() != null ? getPatchlist().getVersion() : GameConstants.DATA_VERSION;
+        return getPatchlist() != null ? getPatchlist().getVersion() : GameConstants.getDataVersion();
     }
     
     public synchronized void loadPatchList() {
@@ -89,7 +89,7 @@ public class HttpServer {
         }
         
         if (this.patchlist != null) {
-            Nebula.getLogger().info("Loaded patchlist version " + patchlist.getVersion());
+            Nebula.getLogger().info("Loaded patchlist (Data version: " + patchlist.getVersion() + ")");
         }
     }
     

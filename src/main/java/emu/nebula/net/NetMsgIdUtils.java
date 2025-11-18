@@ -39,7 +39,7 @@ public class NetMsgIdUtils {
     }
 
     public static void dumpPacketIds() {
-        try (FileWriter writer = new FileWriter("./MsgIds_" + GameConstants.VERSION + ".json")) {
+        try (FileWriter writer = new FileWriter("./MsgIds_" + GameConstants.getGameVersion() + ".json")) {
             // Create sorted tree map
             Map<Integer, String> packetIds = msgIdMap.int2ObjectEntrySet().stream()
                     .filter(e -> e.getIntKey() > 0)

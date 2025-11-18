@@ -34,7 +34,7 @@ public class Handbook {
             var time = Instant.ofEpochMilli(System.currentTimeMillis()).atZone(ZoneId.systemDefault()).format(dtf);
             
             // Header
-            writer.println("# Nebula " + GameConstants.VERSION + " Handbook");
+            writer.println("# Nebula " + GameConstants.getGameVersion() + " Handbook");
             writer.println("# Created " + time);
             
             // Dump characters

@@ -42,15 +42,15 @@ public class Nebula {
     @Getter private static PluginManager pluginManager;
     
     public static void main(String[] args) {
+        // Load config first
+        Nebula.loadConfig();
+        
         // Start Server
         Nebula.getLogger().info("Starting Nebula " + getJarVersion());
         Nebula.getLogger().info("Git hash: " + getGitHash());
-        Nebula.getLogger().info("Game version: " + GameConstants.VERSION);
+        Nebula.getLogger().info("Game version: " + GameConstants.getGameVersion());
         
         boolean generateHandbook = true;
-        
-        // Load config + commands
-        Nebula.loadConfig();
         
         // Load plugin manager
         Nebula.pluginManager = new PluginManager();

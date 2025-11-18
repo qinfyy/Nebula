@@ -3,8 +3,8 @@ package emu.nebula;
 import java.time.ZoneId;
 
 public class GameConstants {
-    public static final int DATA_VERSION = 46;
-    public static final String VERSION = "1.0.0." + DATA_VERSION;
+    private static final int DATA_VERSION = 46;
+    private static final String VERSION = "1.0.0";
     
     public static final ZoneId UTC_ZONE = ZoneId.of("UTC");
     
@@ -33,4 +33,14 @@ public class GameConstants {
     
     public static final int MAX_FRIENDSHIPS = 50;
     public static final int MAX_PENDING_FRIENDSHIPS = 30;
+    
+    // Helper functions
+    
+    public static String getGameVersion() {
+        return VERSION + "." + getDataVersion();
+    }
+    
+    public static int getDataVersion() {
+        return Nebula.getConfig().getCustomDataVersion() > 0 ? Nebula.getConfig().getCustomDataVersion() : DATA_VERSION ;
+    }
 }
