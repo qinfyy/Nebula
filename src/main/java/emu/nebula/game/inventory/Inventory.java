@@ -768,7 +768,7 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
             }
             case 3 -> {
                 // Selected item
-                int selectCount = data.getUseParams().get(selectId);
+                int selectCount = data.getUseParams().get(selectId) * count;
                 
                 if (selectCount <= 0) {
                     return change;

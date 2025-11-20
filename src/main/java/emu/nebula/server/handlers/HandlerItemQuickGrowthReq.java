@@ -20,12 +20,24 @@ public class HandlerItemQuickGrowthReq extends NetHandler {
         
         // Create items
         for (var item : req.getList()) {
+            // Craft item
             if (item.hasProduct()) {
                 session.getPlayer().getInventory().produce(
                         item.getProduct().getId(),
                         item.getProduct().getNum(),
                         change
                 );
+            }
+            // Select item from selector
+            if (item.hasPick()) {
+                for (var pick : item.getPick().getList()) {
+                    session.getPlayer().getInventory().useItem(
+                            pick.getTid(),
+                            pick.getQty(),
+                            pick.getSelectTid(),
+                            change
+                    );
+                }
             }
         }
         
