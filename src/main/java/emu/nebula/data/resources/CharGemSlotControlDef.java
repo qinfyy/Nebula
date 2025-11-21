@@ -49,7 +49,7 @@ public class CharGemSlotControlDef extends BaseDef {
                 list.add(attributeType.getRandomValue());
             }
             
-            if (list.size() >= this.MaxAlterNum) {
+            if (list.getValueCount() >= this.MaxAlterNum) {
                 return list;
             }
         }
