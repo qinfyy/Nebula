@@ -152,11 +152,14 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
         // Save to database
         Nebula.getGameDatabase().addToSet(this, this.getUid(), "extraSkins", id);
         
-        // Send packet
+        // Send packets
         this.getPlayer().addNextPackage(
             NetMsgId.character_skin_gain_notify, 
             Skin.newInstance().setNew(UI32.newInstance().setValue(id))
         );
+        
+        // Set flag for player to update character skins in their handbook
+        this.getPlayer().getCharacters().setUpdateCharHandbook(true);
         
         // Success
         return true;

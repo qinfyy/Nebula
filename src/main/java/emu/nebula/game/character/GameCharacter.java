@@ -245,7 +245,7 @@ public class GameCharacter implements GameDatabaseObject {
             // Set advance skin
             this.skin = this.getData().getAdvanceSkinId();
             
-            // Send packets
+            // Add next packages
             this.getPlayer().addNextPackage(
                 NetMsgId.character_skin_gain_notify, 
                 Skin.newInstance().setNew(UI32.newInstance().setValue(this.getSkin()))
@@ -254,6 +254,9 @@ public class GameCharacter implements GameDatabaseObject {
                 NetMsgId.character_skin_change_notify, 
                 SkinChange.newInstance().setCharId(this.getCharId()).setSkinId(this.getSkin())
             );
+            
+            // Set flag for player to update character skins in their handbook
+            this.getPlayer().getCharacters().setUpdateCharHandbook(true);
         }
         
         // Save to database

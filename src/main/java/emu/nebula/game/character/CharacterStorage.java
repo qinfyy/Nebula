@@ -15,11 +15,15 @@ import emu.nebula.game.player.PlayerChangeInfo;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class CharacterStorage extends PlayerManager {
     private final Int2ObjectMap<GameCharacter> characters;
     private final Int2ObjectMap<GameDisc> discs;
+    
+    @Setter private boolean updateCharHandbook;
+    @Setter private boolean updateDiscHandbook;
     
     public CharacterStorage(Player player) {
         super(player);
@@ -62,6 +66,9 @@ public class CharacterStorage extends PlayerManager {
         
         // Save to database
         character.save();
+        
+        // Set flag for player to update character skins in their handbook
+        this.setUpdateCharHandbook(true);
         
         // Add to characters
         this.characters.put(character.getCharId(), character);
@@ -137,6 +144,9 @@ public class CharacterStorage extends PlayerManager {
         
         // Save to database
         disc.save();
+        
+        // Set flag for player to update discs in their handbook
+        this.setUpdateDiscHandbook(true);
         
         // Add to discs
         this.discs.put(disc.getDiscId(), disc);

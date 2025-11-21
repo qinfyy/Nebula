@@ -144,29 +144,42 @@ public class GameSession {
 
     @SneakyThrows
     public byte[] encodeMsg(int msgId, ProtoMessage<?> proto) {
-        // Add any extra data
-        this.addNextPackages(proto);
+        // Check if we have any packages to send to the client
+        if (this.getPlayer() != null) {
+            // Check if player should add any packages
+            this.checkPlayerStates();
+
+            // Chain next packages for player
+            if (this.getPlayer().hasNextPackages()) {
+                this.addNextPackages(proto);
+            }
+        }
         
         // Encode to message like normal
         return PacketHelper.encodeMsg(msgId, proto);
     }
     
     public byte[] encodeMsg(int msgId) {
-        // Create a proto so we can add next packages
-        if (this.getPlayer() != null && this.getPlayer().hasNextPackages()) {
-            return this.encodeMsg(msgId, Nil.newInstance());
+        // Check if we have any packages to send to the client
+        if (this.getPlayer() != null) {
+            // Check if player should add any packages
+            this.checkPlayerStates();
+            
+            // Chain next packages for player
+            if (this.getPlayer().hasNextPackages()) {
+                // Create a proto so we can add next packages
+                var proto = Nil.newInstance();
+                
+                // Encode proto with next packages
+                return this.encodeMsg(msgId, this.addNextPackages(proto));
+            }
         }
         
         // Encode simple message
         return PacketHelper.encodeMsg(msgId);
     }
     
-    private void addNextPackages(ProtoMessage<?> proto) {
-        // Sanity check and make sure proto has a "nextPackage" field
-        if (this.getPlayer() == null || !PacketHelper.hasNextPackageMethod(proto)) {
-            return;
-        }
-        
+    private void checkPlayerStates() {
         // Update mail state flag
         if (this.getPlayer().getMailbox().isNewState()) {
             // Clear
@@ -177,6 +190,29 @@ public class GameSession {
                 NetMsgId.mail_state_notify, 
                 MailState.newInstance().setNew(true)
             );
+        }
+        
+        // Check handbook states
+        if (this.getPlayer().getCharacters().isUpdateCharHandbook()) {
+            getPlayer().getCharacters().setUpdateCharHandbook(false);
+            getPlayer().addNextPackage(
+                NetMsgId.handbook_change_notify, 
+                this.getPlayer().getCharacters().getCharacterHandbook()
+            );
+        }
+        if (this.getPlayer().getCharacters().isUpdateDiscHandbook()) {
+            getPlayer().getCharacters().setUpdateDiscHandbook(false);
+            getPlayer().addNextPackage(
+                NetMsgId.handbook_change_notify, 
+                this.getPlayer().getCharacters().getDiscHandbook()
+            );
+        }
+    }
+    
+    private ProtoMessage<?> addNextPackages(ProtoMessage<?> proto) {
+        // Sanity check and make sure proto has a "nextPackage" field
+        if (!PacketHelper.hasNextPackageMethod(proto)) {
+            return proto;
         }
         
         // Set next package
@@ -212,5 +248,7 @@ public class GameSession {
                 PacketHelper.setNextPackage(proto, curPacket.toByteArray());
             }
         }
+        
+        return proto;
     }
 }
