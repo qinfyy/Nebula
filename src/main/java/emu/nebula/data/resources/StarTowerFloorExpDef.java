@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 @ResourceType(name = "StarTowerFloorExp.json")
 public class StarTowerFloorExpDef extends BaseDef {
-    private int Id;
     private int StarTowerId;
     private int Stage;
     private int NormalExp;

@@ -12,8 +12,6 @@ public class CharGemAttrValueDef extends BaseDef {
     private int Id;
     private int TypeId;
     private int AttrType;
-    private int AttrTypeFirstSubtype;
-    private int AttrTypeSecondSubtype;
     private int Rarity;
     
     @Override
@@ -23,9 +21,18 @@ public class CharGemAttrValueDef extends BaseDef {
     
     @Override
     public void onLoad() {
-        var data = GameData.getCharGemAttrTypeDataTable().get(this.TypeId);
-        if (data != null) {
-            data.getValues().add(this.getRarity(), this);
+        // Cache attribute values into attribute group defs
+        // Honestly a horrible/inefficient way of doing this
+        for (var data : GameData.getCharGemAttrGroupDataTable()) {
+            for (var type : data.getAttributeTypes()) {
+                // Skip if type id doesnt match
+                if (type.getId() != this.getTypeId()) {
+                    continue;
+                }
+                
+                // Add
+                type.addValue(this);
+            }
         }
     }
 }

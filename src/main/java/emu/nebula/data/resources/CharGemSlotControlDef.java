@@ -4,6 +4,7 @@ import emu.nebula.data.BaseDef;
 import emu.nebula.data.GameData;
 import emu.nebula.data.ResourceType;
 import emu.nebula.util.CustomIntArray;
+import emu.nebula.util.Utils;
 import emu.nebula.util.WeightedList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.Getter;
@@ -19,15 +20,14 @@ public class CharGemSlotControlDef extends BaseDef {
     private int GeneratenCostQty;
     private int RefreshCostQty;
     
-    private int UniqueAttrGroupProb;
-    private int UniqueAttrGroupId;
-    private int GuaranteeCount;
-    
-    private int[] AttrGroupId;
-    
     private int LockableNum;
     private int LockItemTid;
     private int LockItemQty;
+    
+    // These have to be hardcoded now
+    private transient int UniqueAttrGroupProb;
+    private transient int UniqueAttrGroupId;
+    private transient int[] AttrGroupId;
     
     @Override
     public int getId() {
@@ -38,9 +38,15 @@ public class CharGemSlotControlDef extends BaseDef {
         return this.generateAttributes(new CustomIntArray());
     }
     
+    // Check if we should add unique attributes based on the probablity
+    private boolean shouldAddUniqueAttr() {
+        int random = Utils.randomRange(1, 10000);
+        return random <= this.UniqueAttrGroupProb;
+    }
+    
     public IntList generateAttributes(CustomIntArray list) {
         // Add unique attributes
-        if (this.UniqueAttrGroupId > 0) {
+        if (this.UniqueAttrGroupId > 0 && this.shouldAddUniqueAttr()) {
             var group = GameData.getCharGemAttrGroupDataTable().get(this.UniqueAttrGroupId);
             int num = group.getRandomUniqueAttrNum();
             
@@ -75,5 +81,26 @@ public class CharGemSlotControlDef extends BaseDef {
         
         // Complete
         return list;
+    }
+    
+    @Override
+    public void onLoad() {
+        // Hard coded values
+        switch (this.Id) {
+            case 3:
+                this.UniqueAttrGroupProb = 3300;
+                this.UniqueAttrGroupId = 12;
+                this.AttrGroupId = new int[] {9, 10};
+                break;
+            case 2:
+                this.UniqueAttrGroupProb = 4000;
+                this.UniqueAttrGroupId = 11;
+                this.AttrGroupId = new int[] {5, 6, 7, 8};
+                break;
+            case 1:
+            default:
+                this.AttrGroupId = new int[] {1, 2, 3, 4};
+                break;
+        }
     }
 }

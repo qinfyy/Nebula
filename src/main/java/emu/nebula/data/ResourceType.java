@@ -10,13 +10,15 @@ public @interface ResourceType {
     String name();
 
     /**
-     * Load priority - dictates which order to load this resource, with "highest"
-     * being loaded first
+     * Load priority - dictates which order to load this resource, with "highest" being loaded first
      */
     LoadPriority loadPriority() default LoadPriority.NORMAL;
 
-    Class<?> keyType() default int.class;
-
+    /**
+     * Loads the resource file from inside the jar (./resources/defs/) if set to true
+     */
+    boolean useInternal() default false;
+    
     public enum LoadPriority {
         HIGHEST(4), HIGH(3), NORMAL(2), LOW(1), LOWEST(0);
 

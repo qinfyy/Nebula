@@ -1,32 +1,36 @@
 package emu.nebula.data.resources;
 
 import java.util.List;
+import java.util.Map;
 
 import emu.nebula.data.BaseDef;
 import emu.nebula.data.GameData;
 import emu.nebula.data.ResourceType;
-import emu.nebula.data.ResourceType.LoadPriority;
-import emu.nebula.util.JsonUtils;
 import emu.nebula.util.WeightedList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.Getter;
 
 @Getter
-@ResourceType(name = "CharGemAttrGroup.json", loadPriority = LoadPriority.HIGH)
+@ResourceType(name = "CharGemAttrGroups.json", useInternal = true)
 public class CharGemAttrGroupDef extends BaseDef {
-    private int GroupId;
-    private int GroupType;
+    private int Id;
     private int Weight;
-    private String UniqueAttrNumWeight;
+    private IntArrayList AttrTypes;
+    private Map<Integer, Integer> UniqueAttrNumWeights;
     
     private transient WeightedList<Integer> uniqueAttrNum;
-    private transient List<CharGemAttrTypeDef> attributeTypes;
+    private transient List<CharGemAttrTypeData> attributeTypes;
+    
+    public CharGemAttrGroupDef() {
+        this.AttrTypes = new IntArrayList();
+    }
     
     @Override
     public int getId() {
-        return GroupId;
+        return Id;
     }
     
     public int getRandomUniqueAttrNum() {
@@ -37,7 +41,7 @@ public class CharGemAttrGroupDef extends BaseDef {
         return this.uniqueAttrNum.next();
     }
     
-    public CharGemAttrTypeDef getRandomAttributeType(IntList list) {
+    public CharGemAttrTypeData getRandomAttributeType(IntList list) {
         // Setup blacklist to prevent the same attribute from showing up twice
         var blacklist = new IntOpenHashSet();
         
@@ -50,7 +54,7 @@ public class CharGemAttrGroupDef extends BaseDef {
         }
         
         // Create random generator
-        var random = new WeightedList<CharGemAttrTypeDef>();
+        var random = new WeightedList<CharGemAttrTypeData>();
         
         for (var type : this.getAttributeTypes()) {
             if (blacklist.contains(type.getId())) {
@@ -65,15 +69,44 @@ public class CharGemAttrGroupDef extends BaseDef {
     
     @Override
     public void onLoad() {
+        // Init unique attribute weights
         this.uniqueAttrNum = new WeightedList<>();
-        this.attributeTypes = new ObjectArrayList<>();
         
-        if (this.UniqueAttrNumWeight != null) {
-            var json = JsonUtils.decodeMap(this.UniqueAttrNumWeight, Integer.class, Integer.class);
-            
-            for (var entry : json.entrySet()) {
+        if (this.UniqueAttrNumWeights != null) {
+            for (var entry : this.UniqueAttrNumWeights.entrySet()) {
                 this.uniqueAttrNum.add(entry.getValue(), entry.getKey());
             }
+        }
+        
+        // Init attribute types
+        this.attributeTypes = new ObjectArrayList<>();
+        
+        for (int id : this.getAttrTypes()) {
+            var type = new CharGemAttrTypeData(id);
+            this.attributeTypes.add(type);
+        }
+    }
+    
+    @Getter
+    public static class CharGemAttrTypeData {
+        private int id;
+        private WeightedList<CharGemAttrValueDef> values;
+        
+        public CharGemAttrTypeData(int id) {
+            this.id = id;
+            this.values = new WeightedList<>();
+        }
+        
+        protected void addValue(CharGemAttrValueDef value) {
+            this.values.add(value.getRarity(), value);
+        }
+        
+        public CharGemAttrValueDef getRandomValueData() {
+            return this.getValues().next();
+        }
+        
+        public int getRandomValue() {
+            return this.getRandomValueData().getId();
         }
     }
 }

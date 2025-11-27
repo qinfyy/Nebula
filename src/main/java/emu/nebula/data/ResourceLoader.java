@@ -1,5 +1,6 @@
 package emu.nebula.data;
 
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,9 +55,26 @@ public class ResourceLoader {
         int count = 0;
         
         try {
-            var json = JsonUtils.loadToMap(Nebula.getConfig().resourceDir + "/bin/" + type.name(), String.class, resourceClass);
+            // Init defs collection
+            Iterable<?> defs = null;
+            
+            // Load resource file
+            if (type.useInternal()) {
+                // Load from internal resources in jar
+                try (var in = ResourceLoader.class.getResourceAsStream("/defs/" + type.name()); var reader = new InputStreamReader(in)) {
+                    defs = JsonUtils.loadToList(reader, resourceClass);
+                } catch (Exception e) {
+                    // Ignored
+                }
+            } else {
+                // Load json from ./resources/bin/ folder
+                var json = JsonUtils.loadToMap(Nebula.getConfig().resourceDir + "/bin/" + type.name(), String.class, resourceClass);
+                
+                // Get json values
+                defs = json.values();
+            }
 
-            for (Object o : json.values()) {
+            for (Object o : defs) {
                 BaseDef res = (BaseDef) o;
 
                 if (res == null) {
