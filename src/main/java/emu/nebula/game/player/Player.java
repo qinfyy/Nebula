@@ -14,6 +14,7 @@ import emu.nebula.database.GameDatabaseObject;
 import emu.nebula.game.account.Account;
 import emu.nebula.game.achievement.AchievementCondition;
 import emu.nebula.game.achievement.AchievementManager;
+import emu.nebula.game.activity.ActivityManager;
 import emu.nebula.game.agent.AgentManager;
 import emu.nebula.game.battlepass.BattlePassManager;
 import emu.nebula.game.character.CharacterStorage;
@@ -108,6 +109,7 @@ public class Player implements GameDatabaseObject {
     private transient QuestManager questManager;
     private transient AchievementManager achievementManager;
     private transient AgentManager agentManager;
+    private transient ActivityManager activityManager;
     
     // Extra
     private transient Stack<NetMsgPacket> nextPackages;
@@ -691,12 +693,16 @@ public class Player implements GameDatabaseObject {
         this.questManager = this.loadManagerFromDatabase(QuestManager.class);
         this.achievementManager = this.loadManagerFromDatabase(AchievementManager.class);
         this.agentManager = this.loadManagerFromDatabase(AgentManager.class);
+        this.activityManager = this.loadManagerFromDatabase(ActivityManager.class);
         
         // Database fixes
         if (this.showChars == null) {
             this.showChars = new int[3];
             this.save();
         }
+        
+        // Init activities
+        this.getActivityManager().init();
         
         // Load complete
         this.loaded = true;
@@ -903,6 +909,11 @@ public class Player implements GameDatabaseObject {
         
         for (var agent : getAgentManager().getAgents().values()) {
             agentProto.addInfos(agent.toProto());
+        }
+        
+        // Activities
+        for (var activity : getActivityManager().getActivities().values()) {
+            proto.addActivities(activity.toProto());
         }
         
         // Complete

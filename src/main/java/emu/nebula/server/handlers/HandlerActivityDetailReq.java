@@ -2,9 +2,7 @@ package emu.nebula.server.handlers;
 
 import emu.nebula.net.NetHandler;
 import emu.nebula.net.NetMsgId;
-import emu.nebula.proto.ActivityDetail.ActivityMsg;
 import emu.nebula.proto.ActivityDetail.ActivityResp;
-import emu.nebula.proto.Public.ActivityTrial;
 import emu.nebula.net.HandlerId;
 import emu.nebula.net.GameSession;
 
@@ -13,14 +11,14 @@ public class HandlerActivityDetailReq extends NetHandler {
 
     @Override
     public byte[] handle(GameSession session, byte[] message) throws Exception {
+        // Build response
         var rsp = ActivityResp.newInstance();
         
-        var activity = ActivityMsg.newInstance()
-                .setId(700101)
-                .setTrial(ActivityTrial.newInstance());
+        for (var activity : session.getPlayer().getActivityManager().getActivities().values()) {
+            rsp.addList(activity.toMsgProto());
+        }
         
-        rsp.addList(activity);
-        
+        // Encode and send
         return session.encodeMsg(NetMsgId.activity_detail_succeed_ack, rsp);
     }
 

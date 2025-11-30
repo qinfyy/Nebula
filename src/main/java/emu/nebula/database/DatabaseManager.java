@@ -26,7 +26,6 @@ import de.bwaldvogel.mongo.backend.h2.H2Backend;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 import dev.morphia.*;
 import dev.morphia.annotations.Entity;
-import dev.morphia.mapping.Mapper;
 import dev.morphia.mapping.MapperOptions;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Sort;
@@ -84,7 +83,7 @@ public final class DatabaseManager {
                 .stream()
                 .filter(cls -> {
                     Entity e = cls.getAnnotation(Entity.class);
-                    return e != null && !e.value().equals(Mapper.IGNORED_FIELDNAME);
+                    return e != null;
                 })
                 .toList();
 
