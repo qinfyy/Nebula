@@ -176,7 +176,7 @@ public class VampireSurvivorManager extends PlayerManager {
         this.game = null;
         
         // Trigger achievement
-        getPlayer().triggerAchievement(AchievementCondition.VampireWithSpecificClearTotal, 1);
+        getPlayer().trigger(AchievementCondition.VampireWithSpecificClearTotal, 1);
     }
 
     private void updateSavedCards() {

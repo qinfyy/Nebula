@@ -145,7 +145,7 @@ public class GameDisc implements GameDatabaseObject {
         // Check if we leveled up
         if (this.level > oldLevel) {
             // Trigger quest
-            this.getPlayer().triggerQuest(QuestCondition.DiscStrengthenTotal, this.level - oldLevel);
+            this.getPlayer().trigger(QuestCondition.DiscStrengthenTotal, this.level - oldLevel);
         }
         
         // Save to database

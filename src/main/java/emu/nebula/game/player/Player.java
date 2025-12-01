@@ -216,7 +216,7 @@ public class Player implements GameDatabaseObject {
         Nebula.getGameDatabase().update(this, this.getUid(), "level", this.level);
         
         // Trigger achievement
-        this.triggerAchievement(AchievementCondition.WorldClassSpecific, this.getLevel());
+        this.trigger(AchievementCondition.WorldClassSpecific, this.getLevel());
     }
     
     public void setExp(int exp) {
@@ -512,7 +512,7 @@ public class Player implements GameDatabaseObject {
             );
             
             // Trigger achievement
-            this.triggerAchievement(AchievementCondition.WorldClassSpecific, this.getLevel());
+            this.trigger(AchievementCondition.WorldClassSpecific, this.getLevel());
         }
         
         // Calculate changes
@@ -565,7 +565,7 @@ public class Player implements GameDatabaseObject {
         change = modifyEnergy(-amount, change);
         
         // Trigger quest
-        this.triggerQuest(QuestCondition.EnergyDeplete, amount);
+        this.trigger(QuestCondition.EnergyDeplete, amount);
         
         // Complete
         return change;
@@ -617,8 +617,7 @@ public class Player implements GameDatabaseObject {
         this.resetDailies(hasWeekChanged);
         
         // Trigger quest/achievement login
-        this.triggerQuest(QuestCondition.LoginTotal, 1);
-        this.triggerAchievement(AchievementCondition.LoginTotal, 1);
+        this.trigger(QuestCondition.LoginTotal, 1);
         
         // Update last epoch day
         this.lastEpochDay = Nebula.getGameContext().getEpochDays();
@@ -633,21 +632,26 @@ public class Player implements GameDatabaseObject {
     
     // Trigger quests + achievements
     
-    public void triggerQuest(QuestCondition condition, int progress) {
-        this.triggerQuest(condition, progress, 0);
-    }
-    
-    public void triggerQuest(QuestCondition condition, int progress, int param) {
-        this.getQuestManager().trigger(condition, progress, param);
-        this.getBattlePassManager().getBattlePass().trigger(condition, progress, param);
-    }
-    
-    public void triggerAchievement(AchievementCondition condition, int progress) {
-        this.getAchievementManager().trigger(condition, progress, 0, 0);
-    }
-    
-    public void triggerAchievement(AchievementCondition condition, int progress, int param1, int param2) {
+    public void trigger(int condition, int progress, int param1, int param2) {
+        this.getQuestManager().trigger(condition, progress, param1, param2);
+        this.getBattlePassManager().getBattlePass().trigger(condition, progress, param1, param2);
         this.getAchievementManager().trigger(condition, progress, param1, param2);
+    }
+    
+    public void trigger(QuestCondition condition, int progress) {
+        this.trigger(condition.getValue(), progress, 0, 0);
+    }
+    
+    public void trigger(QuestCondition condition, int progress, int param1) {
+        this.trigger(condition.getValue(), progress, param1, 0);
+    }
+    
+    public void trigger(AchievementCondition condition, int progress) {
+        this.trigger(condition.getValue(), progress, 0, 0);
+    }
+    
+    public void trigger(AchievementCondition condition, int progress, int param1, int param2) {
+        this.trigger(condition.getValue(), progress, param1, param2);
     }
     
     // Login

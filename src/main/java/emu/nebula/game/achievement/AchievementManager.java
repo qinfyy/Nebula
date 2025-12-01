@@ -45,6 +45,12 @@ public class AchievementManager extends PlayerManager implements GameDatabaseObj
         this.save();
     }
     
+    public synchronized int getCompletedAchievementsCount() {
+        return (int) this.getAchievements().values().stream()
+                .filter(GameAchievement::isComplete)
+                .count();
+    }
+    
     /**
      * Returns true if there are any unclaimed achievements
      */
@@ -73,6 +79,9 @@ public class AchievementManager extends PlayerManager implements GameDatabaseObj
     }
     
     public synchronized void handleClientEvents(Events events) {
+        //
+        boolean hasCompleted = false;
+        
         // Parse events
         for (var event : events.getList()) {
             // Check id
@@ -115,13 +124,28 @@ public class AchievementManager extends PlayerManager implements GameDatabaseObj
                 
                 // Set save flag
                 this.queueSave = true;
+                
+                // Check if achievement was completed
+                if (achievement.isComplete()) {
+                    hasCompleted = true;
+                }
             }
+        }
+        
+        // Trigger update
+        if (hasCompleted) {
+            this.getPlayer().trigger(AchievementCondition.AchievementTotal, this.getCompletedAchievementsCount());
         }
     }
     
-    public synchronized void trigger(AchievementCondition condition, int progress, int param1, int param2) {
+    public synchronized void trigger(int condition, int progress, int param1, int param2) {
         // Sanity check
         if (progress <= 0) {
+            return;
+        }
+        
+        // Blacklist
+        if (condition == AchievementCondition.ClientReport.getValue()) {
             return;
         }
         
@@ -133,7 +157,8 @@ public class AchievementManager extends PlayerManager implements GameDatabaseObj
         }
         
         // Check what type of achievement condition this is
-        boolean isTotal = condition.name().endsWith("Total");
+        boolean isTotal = AchievementHelper.isTotalAchievement(condition);
+        boolean hasCompleted = false;
         
         // Parse achievements
         for (var data : triggerList) {
@@ -150,7 +175,17 @@ public class AchievementManager extends PlayerManager implements GameDatabaseObj
                 
                 // Set save flag
                 this.queueSave = true;
+                
+                // Check if achievement was completed
+                if (achievement.isComplete()) {
+                    hasCompleted = true;
+                }
             }
+        }
+        
+        // Trigger update
+        if (hasCompleted) {
+            this.getPlayer().trigger(AchievementCondition.AchievementTotal, this.getCompletedAchievementsCount());
         }
     }
     

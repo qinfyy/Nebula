@@ -166,7 +166,7 @@ public class GachaModule extends GameContextModule {
         player.getGachaManager().addGachaHistory(log);
         
         // Trigger achievements
-        player.triggerAchievement(AchievementCondition.GachaTotal, amount);
+        player.trigger(AchievementCondition.GachaTotal, amount);
         
         // Complete
         return new GachaResult(info, change, results);

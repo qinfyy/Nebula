@@ -127,7 +127,7 @@ public class CharacterContact {
         }
         
         // Trigger quest/achievement
-        this.getCharacter().getPlayer().triggerAchievement(AchievementCondition.ChatTotal, 1);
+        this.getCharacter().getPlayer().trigger(AchievementCondition.ChatTotal, 1);
         
         // Success
         return change.setSuccess(true);

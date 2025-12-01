@@ -20,6 +20,7 @@ import emu.nebula.proto.Public.Res;
 import emu.nebula.proto.Public.Title;
 import emu.nebula.proto.Public.UI32;
 import emu.nebula.util.String2IntMap;
+import emu.nebula.game.achievement.AchievementCondition;
 import emu.nebula.game.player.Player;
 import emu.nebula.game.player.PlayerChangeInfo;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -462,11 +463,11 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
             }
         }
         
-        // Trigger quest
+        // Trigger quest + achievement
         if (amount > 0) {
-            this.getPlayer().triggerQuest(QuestCondition.ItemsAdd, amount, id);
+            this.getPlayer().trigger(QuestCondition.ItemsAdd, amount, id);
         } else {
-            this.getPlayer().triggerQuest(QuestCondition.ItemsDeplete, Math.abs(amount), id);
+            this.getPlayer().trigger(QuestCondition.ItemsDeplete, Math.abs(amount), id);
         }
         
         //
@@ -633,6 +634,9 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
         
         // Add produced items
         this.addItem(data.getProductionId(), data.getProductionPerBatch() * num, change);
+        
+        // Trigger achievement
+        this.getPlayer().trigger(AchievementCondition.ItemsProductTotal, num);
         
         // Success
         return change.setSuccess(true);

@@ -63,8 +63,8 @@ public class InstanceManager extends PlayerManager {
             this.getProgress().saveInstanceLog(log, logName, data.getId(), star);
             
             // Quest triggers
-            this.getPlayer().triggerQuest(questCondition, 1);
-            this.getPlayer().triggerQuest(QuestCondition.BattleTotal, 1);
+            this.getPlayer().trigger(questCondition, 1);
+            this.getPlayer().trigger(QuestCondition.BattleTotal, 1);
         }
         
         // Set extra data
@@ -131,8 +131,8 @@ public class InstanceManager extends PlayerManager {
         change.setExtraData(list);
         
         // Quest triggers
-        this.getPlayer().triggerQuest(questCondition, count);
-        this.getPlayer().triggerQuest(QuestCondition.BattleTotal, count);
+        this.getPlayer().trigger(questCondition, count);
+        this.getPlayer().trigger(QuestCondition.BattleTotal, count);
         
         // Success
         return change.setSuccess(true);

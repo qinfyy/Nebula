@@ -20,8 +20,8 @@ public class AchievementDef extends BaseDef {
     private int Qty1;
     
     // Custom params
-    private transient int param1 = -1;
-    private transient int param2 = -1;
+    private transient int param1;
+    private transient int param2;
     
     @Override
     public int getId() {
@@ -34,11 +34,11 @@ public class AchievementDef extends BaseDef {
     }
 
     public boolean hasParam1() {
-        return this.param1 >= 0;
+        return this.param1 > 0;
     }
     
     public boolean hasParam2() {
-        return this.param2 >= 0;
+        return this.param2 > 0;
     }
 
     @Override

@@ -24,7 +24,7 @@ public class ResourceLoader {
         loadResources();
         
         // Add hardcoded achievements params
-        AchievementHelper.fixParams();
+        AchievementHelper.init();
         
         // Done
         loaded = true;

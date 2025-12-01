@@ -16,7 +16,6 @@ import emu.nebula.game.inventory.ItemParamMap;
 import emu.nebula.game.player.Player;
 import emu.nebula.game.player.PlayerChangeInfo;
 import emu.nebula.game.quest.GameQuest;
-import emu.nebula.game.quest.QuestCondition;
 import emu.nebula.game.quest.QuestType;
 import emu.nebula.net.NetMsgId;
 import emu.nebula.proto.BattlePassInfoOuterClass.BattlePassInfo;
@@ -123,10 +122,10 @@ public class BattlePass implements GameDatabaseObject {
         this.save();
     }
     
-    public synchronized void trigger(QuestCondition condition, int progress, int param) {
+    public synchronized void trigger(int condition, int progress, int param1, int param2) {
         for (var quest : getQuests().values()) {
             // Try to trigger quest
-            boolean result = quest.trigger(condition, progress, param);
+            boolean result = quest.trigger(condition, progress, param1, param2);
             
             // Skip if quest progress wasn't changed
             if (!result) {

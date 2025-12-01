@@ -18,7 +18,7 @@ For any extra support, questions, or discussions, check out our [Discord](https:
 - Shop (only in-game currency supported)
 - Commissions
 - Heartlink
-- Achievements (not all of them are scripted properly)
+- Achievements
 - Monoliths (completeable but many other features missing)
 - Bounty Trials
 - Menance Arena

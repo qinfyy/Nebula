@@ -208,7 +208,7 @@ public class StarTowerManager extends PlayerManager {
         this.game = new StarTowerGame(this, data, formation, req);
         
         // Trigger quest
-        this.getPlayer().triggerQuest(QuestCondition.TowerEnterFloor, 1);
+        this.getPlayer().trigger(QuestCondition.TowerEnterFloor, 1);
         
         // Success
         return change.setExtraData(this.game);
@@ -228,13 +228,14 @@ public class StarTowerManager extends PlayerManager {
         // Handle victory events
         if (victory) {
             // Trigger achievements
-            this.getPlayer().triggerAchievement(
+            this.getPlayer().trigger(AchievementCondition.TowerClearTotal, 1);
+            this.getPlayer().trigger(
                 AchievementCondition.TowerClearSpecificGroupIdAndDifficulty,
                 1,
                 game.getData().getGroupId(),
                 game.getData().getDifficulty()
             );
-            this.getPlayer().triggerAchievement(
+            this.getPlayer().trigger(
                 AchievementCondition.TowerClearSpecificLevelWithDifficultyAndTotal,
                 1,
                 game.getData().getId(),

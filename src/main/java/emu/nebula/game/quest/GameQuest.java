@@ -55,19 +55,19 @@ public class GameQuest {
         return 0;
     }
 
-    public boolean trigger(QuestCondition condition, int progress, int param) {
+    public boolean trigger(int condition, int progress, int param1, int param2) {
         // Sanity check
         if (this.isComplete()) {
             return false;
         }
         
         // Skip if not the correct condition
-        if (this.cond != condition.getValue()) {
+        if (this.cond != condition) {
             return false;
         }
         
         // Check quest param
-        if (this.param != 0 && param != this.param) {
+        if (this.param != 0 && param1 != this.param) {
             return false;
         }
         

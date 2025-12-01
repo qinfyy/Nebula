@@ -85,7 +85,7 @@ public class AgentManager extends PlayerManager implements GameDatabaseObject {
         this.getAgents().put(agent.getId(), agent);
         
         // Quest
-        this.getPlayer().triggerQuest(QuestCondition.AgentApplyTotal, 1);
+        this.getPlayer().trigger(QuestCondition.AgentApplyTotal, 1);
         
         // Success
         return agent;
@@ -184,8 +184,8 @@ public class AgentManager extends PlayerManager implements GameDatabaseObject {
         this.save();
         
         // Quest + Achievements
-        getPlayer().triggerQuest(QuestCondition.AgentFinishTotal, list.size());
-        getPlayer().triggerAchievement(AchievementCondition.AgentWithSpecificFinishTotal, list.size());
+        getPlayer().trigger(QuestCondition.AgentFinishTotal, list.size());
+        getPlayer().trigger(AchievementCondition.AgentWithSpecificFinishTotal, list.size());
         
         // Success
         return change.setSuccess(true);
