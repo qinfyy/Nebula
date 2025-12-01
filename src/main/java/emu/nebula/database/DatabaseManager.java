@@ -163,12 +163,16 @@ public final class DatabaseManager {
         return getDatastore().find(cls).stream();
     }
     
-    public <T> List<T> getSortedObjects(Class<T> cls, String filter, int limit) {
+    public <T> List<T> getSortedObjects(Class<T> cls, String filter, int value, String sortBy, int limit) {
         var options = new FindOptions()
-                .sort(Sort.descending(filter))
+                .sort(Sort.descending(sortBy))
                 .limit(limit);
         
-        return getDatastore().find(cls).iterator(options).toList();
+        return getDatastore()
+                .find(cls)
+                .filter(Filters.eq(filter, value))
+                .iterator(options)
+                .toList();
     }
 
     public <T> void save(T obj) {

@@ -41,8 +41,7 @@ public class RemoteHandler implements Handler {
         // Check admin key
         if (token.equals(adminKey)) {
             Nebula.getCommandManager().invoke(null, command);
-            Nebula.getLogger().warn(
-                    "\u001B[38;2;252;186;3mRemote Server (Using Admin Key) sent command: /" + command + "\u001B[0m");
+            Nebula.getLogger().warn("\u001B[38;2;252;186;3mRemote Server (Using Admin Key) sent command: /" + command + "\u001B[0m");
             ctx.status(200);
             ctx.contentType(ContentType.APPLICATION_JSON);
             ctx.result("{\"Code\":200,\"Data\":{},\"Msg\":\"Command executed\"}");

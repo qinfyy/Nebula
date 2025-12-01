@@ -21,6 +21,11 @@ public class ScoreBossModule extends GameContextModule {
         this.ranking = new ArrayList<>();
     }
     
+    // TODO calculate from bin data
+    public int getControlId() {
+        return 2;
+    }
+    
     private long getRefreshTime() {
         return Nebula.getConfig().getServerOptions().leaderboardRefreshTime * 1000;
     }
@@ -39,7 +44,7 @@ public class ScoreBossModule extends GameContextModule {
         this.ranking.clear();
         
         // Get from database
-        var list = Nebula.getGameDatabase().getSortedObjects(ScoreBossRankEntry.class, "score", 50);
+        var list = Nebula.getGameDatabase().getSortedObjects(ScoreBossRankEntry.class, "controlId", this.getControlId(), "score", 50);
         
         for (int i = 0; i < list.size(); i++) {
             // Get rank entry and set proto

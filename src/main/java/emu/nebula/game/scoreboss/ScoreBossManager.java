@@ -19,9 +19,8 @@ public class ScoreBossManager extends PlayerManager  {
         super(player);
     }
     
-    // TODO calculate from bin data
     public int getControlId() {
-        return 2;
+        return Nebula.getGameContext().getScoreBossModule().getControlId();
     }
     
     public ScoreBossControlDef getControlData() {
