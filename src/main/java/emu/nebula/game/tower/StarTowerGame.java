@@ -353,7 +353,7 @@ public class StarTowerGame {
                 
                 // Clamp level
                 int curLevel = getPotentials().get(id);
-                int nextLevel = Math.min(curLevel + count, potentialData.getMaxLevel());
+                int nextLevel = Math.min(curLevel + count, potentialData.getMaxLevel(this));
                 
                 // Sanity
                 count = nextLevel - curLevel;
@@ -529,7 +529,7 @@ public class StarTowerGame {
             
             // Check max level
             int level = item.getIntValue();
-            if (level >= potential.getMaxLevel()) {
+            if (level >= potential.getMaxLevel(this)) {
                 continue;
             }
             

@@ -140,8 +140,7 @@ public class StarTowerBuild implements GameDatabaseObject {
             var data = GameData.getPotentialDataTable().get(potential.getIntKey());
             if (data == null) continue;
             
-            int index = potential.getIntValue() - 1;
-            this.score += data.getBuildScore()[index];
+            this.score += data.getBuildScore(potential.getIntValue());
         }
         
         // Sub note skills

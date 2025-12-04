@@ -16,6 +16,9 @@ public class StarTowerModifiers {
     private boolean freeStrengthen;
     private int strengthenDiscount;
     
+    // Bonus max potential level
+    private int bonusMaxPotentialLevel;
+    
     public StarTowerModifiers(StarTowerGame game) {
         this.game = game;
         
@@ -27,8 +30,16 @@ public class StarTowerModifiers {
         
         if (this.hasGrowthNode(30402)) {
             this.strengthenDiscount += 60;
-        } else if (this.hasGrowthNode(30102)) {
+        }
+        if (this.hasGrowthNode(30102)) {
             this.strengthenDiscount += 30;
+        }
+        
+        // Bonus max level
+        if (this.hasGrowthNode(30301)) {
+            this.bonusMaxPotentialLevel = 6;
+        } else if (this.hasGrowthNode(20601)) {
+            this.bonusMaxPotentialLevel = 4;
         }
     }
     
