@@ -111,6 +111,7 @@ public class ActivityManager extends PlayerManager implements GameDatabaseObject
         
         GameActivity activity = switch (data.getType()) {
             case Trial -> new TrialActivity(this, data);
+            case TowerDefense -> new TowerDefenseActivity(this, data);
             default -> null;
         };
         

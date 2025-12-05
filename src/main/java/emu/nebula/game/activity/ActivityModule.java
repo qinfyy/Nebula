@@ -19,6 +19,8 @@ public class ActivityModule extends GameContextModule {
         this.activities.add(700103);
         this.activities.add(700104);
         this.activities.add(700107);
+
+        this.activities.add(102001);        // Tower defense activity
         
         //this.activities.add(101002);
         //this.activities.add(101003);
