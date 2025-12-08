@@ -60,10 +60,12 @@ public class GameSession {
         var player = this.player;
         this.player = null;
 
-        // Remove session from player
-        player.removeSession();
+        // Remove session reference from player ONLY if their session wasn't replaced yet
+        if (player.getSession() == this) {
+            player.setSession(null);
+        }
 
-        // Set remove flag
+        // Set session removal flag
         this.remove = true;
     }
 

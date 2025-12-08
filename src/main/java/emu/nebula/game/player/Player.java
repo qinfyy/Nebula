@@ -1,7 +1,6 @@
 package emu.nebula.game.player;
 
 import java.util.Stack;
-import java.util.concurrent.TimeUnit;
 
 import dev.morphia.annotations.AlsoLoad;
 import dev.morphia.annotations.Entity;
@@ -189,30 +188,26 @@ public class Player implements GameDatabaseObject {
     }
     
     public void setSession(GameSession session) {
-        int time = Nebula.getConfig().getServerOptions().sessionTimeout;
-        long timeout = System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(time);
-
-        if (this.session == null) {
-            // Set session
-            this.session = session;
+        // Don't set session if it's the same session
+        if (this.session == session) {
             return;
         }
-
-        // 1. Sanity check
-        // 2. Prevent incorrect deletion of players when re-logging into the game
-        if (this.session == session || this.lastLogin > timeout) {
-            return;
-        }
-
-        // Clear player from session
-        this.session.clearPlayer();
+        
+        // Cache previous session
+        var prevSession = this.session;
+        
         // Set session
         this.session = session;
-    }
-    
-    public void removeSession() {
-        this.session = null;
-        Nebula.getGameContext().getPlayerModule().removeFromCache(this);
+        
+        // Clear player reference from the previous session
+        if (prevSession != null) {
+            prevSession.clearPlayer();
+        }
+        
+        // We cleared session, now remove player from cache
+        if (this.session == null) {
+            Nebula.getGameContext().getPlayerModule().removeFromCache(this);
+        }
     }
     
     public boolean hasSession() {
@@ -237,14 +232,12 @@ public class Player implements GameDatabaseObject {
 
     public void setRemoteToken(String token) {
         // Skip if tokens are the same
-        if (this.remoteToken == null) {
+        if (this.getRemoteToken() == null) {
             if (token == null) {
                 return;
             }
-        } else if (this.remoteToken != null) {
-            if (this.remoteToken.equals(token)) {
-                return;
-            }
+        } else if (this.getRemoteToken().equals(token)) {
+            return;
         }
         
         // Set remote token
