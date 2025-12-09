@@ -51,6 +51,9 @@ public class StarTowerModifiers {
     private double bonusCoinChance;
     private int bonusCoinCount;
     
+    // Random npc event
+    private double battleNpcEventChance;
+    
     public StarTowerModifiers(StarTowerGame game) {
         this.game = game;
         
@@ -183,6 +186,13 @@ public class StarTowerModifiers {
         } else if (this.hasGrowthNode(10203)) {
             this.bonusCoinChance = 0.1;
             this.bonusCoinCount = 10;
+        }
+        
+        // Battle npc event chance (Destiny's Choice)
+        if (game.getDifficulty() >= 4 && this.hasGrowthNode(20503)) {
+            this.battleNpcEventChance = 0.3;
+        } else if (game.getDifficulty() >= 3 && this.hasGrowthNode(10901)) {
+            this.battleNpcEventChance = 0.2;
         }
     }
     

@@ -518,7 +518,7 @@ public class StarTowerGame {
         cases.add(this.createExit());
         
         // Create shop npc if this is the last room
-        if (this.isOnFinalFloor()) {
+        if (this.getRoom().getType() == RoomType.FinalBossRoom) {
             // Create hawker case (shop)
             cases.add(new StarTowerHawkerCase());
             // Create strengthen machine
@@ -526,8 +526,13 @@ public class StarTowerGame {
                 cases.add(new StarTowerStrengthenMachineCase());
             }
         } else if (this.getRoom() instanceof StarTowerBattleRoom) {
-            // Create recovery npc
-            cases.add(new StarTowerNpcRecoveryHPCase());
+            if (this.getRoom().getType() == RoomType.BattleRoom && Utils.randomChance(this.getModifiers().getBattleNpcEventChance())) {
+                // Create npc event
+                cases.add(this.getRoom().createNpcEvent());
+            } else {
+                // Create recovery npc
+                cases.add(new StarTowerNpcRecoveryHPCase());
+            }
         }
         
         // Complete
