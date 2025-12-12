@@ -122,8 +122,7 @@ public class GameSession {
             return false;
         }
 
-        // Note: We should cache players in case multiple sessions try to login to the
-        // same player at the time
+        // Note: We should cache players in case multiple sessions try to login to the same player at the time
         // Get player by account
         var player = Nebula.getGameContext().getPlayerModule().loadPlayer(account);
 

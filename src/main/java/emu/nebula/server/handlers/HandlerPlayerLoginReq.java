@@ -1,7 +1,6 @@
 package emu.nebula.server.handlers;
 
 import emu.nebula.Nebula;
-import emu.nebula.game.player.Player;
 import emu.nebula.game.player.PlayerErrorCode;
 import emu.nebula.net.GameSession;
 import emu.nebula.net.HandlerId;
@@ -31,7 +30,6 @@ public class HandlerPlayerLoginReq extends NetHandler {
             loginToken = req.getOfficial().getToken();
         }
 
-
         var banModule = Nebula.getGameContext().getBanModule();
 
         // Check IP ban
@@ -48,9 +46,8 @@ public class HandlerPlayerLoginReq extends NetHandler {
         }
 
         // Check player ban
-        int playerUid = session.getPlayer().getUid();
-        if (banModule.isPlayerBanned(playerUid)) {
-            var banInfo = banModule.getPlayerBanInfo(playerUid);
+        if (session.getPlayer() != null && banModule.isPlayerBanned(session.getPlayer().getUid())) {
+            var banInfo = banModule.getPlayerBanInfo(session.getPlayer().getUid());
             return session.encodeMsg(NetMsgId.player_login_failed_ack, banInfo.toProto());
         }
 
