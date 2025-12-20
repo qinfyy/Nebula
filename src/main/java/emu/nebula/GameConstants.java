@@ -47,6 +47,10 @@ public class GameConstants {
     public static final int CHARACTER_MAX_GEM_PRESETS = 3;
     public static final int CHARACTER_MAX_GEM_SLOTS = 3;
     
+    public static final int CHARACTER_TAG_VANGUARD = 101;
+    public static final int CHARACTER_TAG_VERSATILE = 102;
+    public static final int CHARACTER_TAG_SUPPORT = 103;
+    
     public static final int MAX_FORMATIONS = 6;
     public static final int MAX_SHOWCASE_IDS = 5;
     

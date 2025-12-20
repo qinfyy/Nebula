@@ -421,7 +421,7 @@ public class StarTowerGame {
                 this.getPotentials().put(id, nextLevel);
                 
                 // Add to rare potential count
-                if (potentialData.isRare()) {
+                if (potentialData.isSpecial()) {
                     this.getRarePotentialCount().add(potentialData.getCharId(), 1);
                 }
                 
@@ -574,46 +574,26 @@ public class StarTowerGame {
     /**
      * Creates a potential selector for the specified character
      */
-    public StarTowerPotentialCase createPotentialSelector(int charId, boolean rare) {
+    public StarTowerPotentialCase createPotentialSelector(int charId, boolean special) {
         // Check character id
         if (charId <= 0) {
             charId = this.getRandomCharId();
         }
         
         // Make sure character can't have more than 2 rare potentials
-        if (rare && this.getRarePotentialCount(charId) >= 2) {
+        if (special && this.getRarePotentialCount(charId) >= 2) {
             return null;
         }
         
         // Get character potentials
         var data = GameData.getCharPotentialDataTable().get(charId);
+        
         if (data == null) {
             return null;
         }
         
         // Random potentials list
-        var list = new IntArrayList();
-        
-        // Add potentials based on character role
-        boolean isMainCharacter = this.getCharIds()[0] == charId;
-        
-        if (isMainCharacter) {
-            if (rare) {
-                list.addElements(0, data.getMasterSpecificPotentialIds());
-            } else {
-                list.addElements(0, data.getMasterNormalPotentialIds());
-            }
-        } else {
-            if (rare) {
-                list.addElements(0, data.getAssistSpecificPotentialIds());
-            } else {
-                list.addElements(0, data.getAssistNormalPotentialIds());
-            }
-        }
-        
-        if (!rare) {
-            list.addElements(0, data.getCommonPotentialIds()); 
-        }
+        var list = data.getPotentialList(this.getCharIds()[0] == charId, special);
         
         // Remove potentials we already have maxed out
         var potentials = new IntArrayList();
@@ -674,7 +654,7 @@ public class StarTowerGame {
         }
         
         // Creator potential selector case
-        if (rare) {
+        if (special) {
             return new StarTowerSelectSpecialPotentialCase(this, charId, selector);
         } else {
             return new StarTowerPotentialCase(this, charId, selector);

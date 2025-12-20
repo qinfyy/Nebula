@@ -11,7 +11,7 @@ import lombok.Getter;
 @ResourceType(name = "CharacterDes.json", loadPriority = LoadPriority.LOW)
 public class CharacterDesDef extends BaseDef {
     private int Id;
-    private int[] Tag;
+    private IntOpenHashSet Tag;
     private IntOpenHashSet PreferTags;
     private IntOpenHashSet HateTags;
     

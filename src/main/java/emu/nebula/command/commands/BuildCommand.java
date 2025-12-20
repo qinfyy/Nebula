@@ -35,7 +35,7 @@ public class BuildCommand implements CommandHandler {
             int id = Utils.parseSafeInt(arg);
             int count = 1;
             
-            this.parseItem(builder, id, count);
+            builder.parseItem(id, count);
         }
         
         if (args.getMap() != null) {
@@ -43,7 +43,7 @@ public class BuildCommand implements CommandHandler {
                 int id = entry.getIntKey();
                 int count = entry.getIntValue();
                 
-                this.parseItem(builder, id, count);
+                builder.parseItem(id, count);
             }
         }
         
@@ -66,55 +66,17 @@ public class BuildCommand implements CommandHandler {
         target.addNextPackage(NetMsgId.st_import_build_notify, build.toProto());
             
         // Send result to player
-        return "Created record for " + target.getName() + " (This command make take time to update on the client)";
-    }
-    
-    private void parseItem(StarTowerBuildData builder, int id, int count) {
-        // Get item data
-        var itemData = GameData.getItemDataTable().get(id);
-        if (itemData == null) {
-            return;
+        String result = "Created record for " + target.getName();
+        
+        if (args.getSender() == null) {
+            result += " (This command may take time to update on the client)";
         }
         
-        // Clamp
-        count = Math.max(count, 1);
-        
-        // Parse by item id
-        switch (itemData.getItemSubType()) {
-            case Char -> {
-                var character = builder.getPlayer().getCharacters().getCharacterById(id);
-                if (character == null || !character.getData().isAvailable()) {
-                    break;
-                }
-                
-                builder.addCharacter(character);
-            }
-            case Disc -> {
-                var disc = builder.getPlayer().getCharacters().getDiscById(id);
-                if (disc == null || !disc.getData().isAvailable()) {
-                    break;
-                }
-                
-                builder.addDisc(disc);
-            }
-            case Potential, SpecificPotential -> {
-                var potentialData = GameData.getPotentialDataTable().get(id);
-                if (potentialData == null) break;
-                
-                int level = Math.min(count, potentialData.getMaxLevel());
-                builder.getBuild().getPotentials().add(id, level);
-            }
-            case SubNoteSkill -> {
-                builder.getBuild().getSubNoteSkills().add(id, count);
-            }
-            default -> {
-                // Ignored
-            }
-        }
+        return result;
     }
 
     @Getter
-    private static class StarTowerBuildData {
+    public static class StarTowerBuildData {
         private Player player;
         private StarTowerBuild build;
         private List<GameCharacter> characters;
@@ -125,6 +87,50 @@ public class BuildCommand implements CommandHandler {
             this.build = new StarTowerBuild(player);
             this.characters = new ArrayList<>();
             this.discs = new ArrayList<>();
+        }
+        
+        public void parseItem(int id, int count) {
+            // Get item data
+            var itemData = GameData.getItemDataTable().get(id);
+            if (itemData == null) {
+                return;
+            }
+            
+            // Clamp
+            count = Math.max(count, 1);
+            
+            // Parse by item id
+            switch (itemData.getItemSubType()) {
+                case Char -> {
+                    var character = this.getPlayer().getCharacters().getCharacterById(id);
+                    if (character == null || !character.getData().isAvailable()) {
+                        break;
+                    }
+                    
+                    this.addCharacter(character);
+                }
+                case Disc -> {
+                    var disc = this.getPlayer().getCharacters().getDiscById(id);
+                    if (disc == null || !disc.getData().isAvailable()) {
+                        break;
+                    }
+                    
+                    this.addDisc(disc);
+                }
+                case Potential, SpecificPotential -> {
+                    var potentialData = GameData.getPotentialDataTable().get(id);
+                    if (potentialData == null) break;
+                    
+                    int level = Math.min(count, potentialData.getMaxLevel());
+                    this.getBuild().getPotentials().add(id, level);
+                }
+                case SubNoteSkill -> {
+                    this.getBuild().getSubNoteSkills().add(id, count);
+                }
+                default -> {
+                    // Ignored
+                }
+            }
         }
         
         public void addCharacter(GameCharacter character) {
