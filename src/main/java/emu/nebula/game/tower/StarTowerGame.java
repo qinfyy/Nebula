@@ -249,6 +249,10 @@ public class StarTowerGame {
         return Utils.randomElement(this.getCharIds());
     }
     
+    public void setHp(int hp) {
+        this.charHp = hp;
+    }
+    
     public StarTowerStageDef getStageData(int stageNum, int stageFloor) {
         var stageId = (this.getId() * 10000) + (stageNum * 100) + stageFloor;
         return GameData.getStarTowerStageDataTable().get(stageId);
@@ -792,7 +796,13 @@ public class StarTowerGame {
         
         // Handle interaction with tower case
         if (towerCase != null) {
+            // Interact with case
             rsp = towerCase.interact(req, rsp);
+            
+            // Remove case
+            if (towerCase.removeAfterInteract()) {
+                this.getRoom().getCases().remove(req.getId());
+            }
         } else {
             rsp.getMutableNilResp();
         }

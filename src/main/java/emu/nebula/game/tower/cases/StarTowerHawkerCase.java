@@ -31,6 +31,11 @@ public class StarTowerHawkerCase extends StarTowerBaseCase {
     }
     
     @Override
+    public boolean removeAfterInteract() {
+        return false;
+    }
+    
+    @Override
     public void onRegister() {
         this.initGoods();
     }
@@ -249,6 +254,10 @@ public class StarTowerHawkerCase extends StarTowerBaseCase {
             
             if (goods.getCharPos() > 0) {
                 info.setCharPos(goods.getCharPos());
+            }
+            
+            if (goods.isSold()) {
+                hawker.addPurchase(sid);
             }
             
             hawker.addList(info);

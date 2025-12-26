@@ -15,6 +15,11 @@ public class StarTowerStrengthenMachineCase extends StarTowerBaseCase {
     private int times;
     
     @Override
+    public boolean removeAfterInteract() {
+        return false;
+    }
+    
+    @Override
     public void onRegister() {
         // Set strengthen price
         this.free = this.getModifiers().isFreeStrengthen();

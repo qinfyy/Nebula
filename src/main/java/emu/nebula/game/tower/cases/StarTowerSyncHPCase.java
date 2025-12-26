@@ -15,6 +15,13 @@ public class StarTowerSyncHPCase extends StarTowerBaseCase {
     
     @Override
     public StarTowerInteractResp interact(StarTowerInteractReq req, StarTowerInteractResp rsp) {
+        // Get hp
+        int hp = req.getRecoveryHPReq().getHp();
+        
+        // Sync with game
+        this.getGame().setHp(hp);
+        
+        // Complete
         return rsp;
     }
     

@@ -29,6 +29,10 @@ public abstract class StarTowerBaseCase {
     }
     
     public abstract CaseType getType();
+    
+    public boolean removeAfterInteract() {
+        return true;
+    }
 
     public void register(StarTowerBaseRoom room) {
         this.game = room.getGame();
