@@ -41,7 +41,7 @@ public class ActivityModule extends GameContextModule {
         this.activities.add(700110);
 
         // Tower defense activity
-        this.activities.add(102001);
+        this.activities.add(102002);
         
         // Christmas 2025 login events
         this.activities.add(301011);
