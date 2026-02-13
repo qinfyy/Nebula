@@ -16,7 +16,11 @@ public class HandlerActivityTowerDefenseLevelSettleReq extends NetHandler {
         var req = ActivityTowerDefenseLevelSettleReq.parseFrom(message);
 
         // Get activity
-        var activity = session.getPlayer().getActivityManager().getActivity(TowerDefenseActivity.class, 102001);
+        var activity = session.getPlayer().getActivityManager().getFirstActivity(TowerDefenseActivity.class);
+        
+        if (activity == null) {
+            return session.encodeMsg(NetMsgId.activity_tower_defense_level_settle_failed_ack);
+        }
 
         // Claim rewards
         var change = activity.claimReward(req.getLevelId());
