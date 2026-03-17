@@ -12,6 +12,7 @@ import emu.nebula.data.resources.ActivityDef;
 import emu.nebula.data.resources.JointDrill2LevelDef;
 import emu.nebula.game.activity.ActivityManager;
 import emu.nebula.game.activity.GameActivity;
+import emu.nebula.game.inventory.ItemParamMap;
 import emu.nebula.game.jointdrill.JointDrillBuild;
 import emu.nebula.game.jointdrill.JointDrillRankEntry;
 import emu.nebula.game.jointdrill.JointDrillScore;
@@ -243,6 +244,55 @@ public class JointDrillActivity extends GameActivity {
         
         // Complete
         return score;
+    }
+    
+    public synchronized PlayerChangeInfo sweep(int levelId, int count) {
+        // Sanity check
+        if (count <= 0) {
+            return null;
+        }
+        
+        // Check if the player has completed this level
+        if (!this.getPassedLevels().containsKey(levelId)) {
+            return null;
+        }
+        
+        // Verify that we have enough tickets
+        if (!getPlayer().getInventory().hasItem(GameConstants.JOINT_DRILL_TICKET_ID, count)) {
+            return null;
+        }
+        
+        // Get level data
+        var level = GameData.getJointDrill2LevelDataTable().get(levelId);
+        
+        if (level == null) {
+            return null;
+        }
+        
+        // Setup variables
+        var change = new PlayerChangeInfo();
+        var totalRewards = new ItemParamMap();
+        var list = new ArrayList<>();
+        
+        // Consume tickets
+        getPlayer().getInventory().removeItem(GameConstants.JOINT_DRILL_TICKET_ID, count, change);
+        
+        // Generate rewards from sweep
+        for (int i = 0; i < count; i++) {
+            var rewards = level.getRewards().generate();
+            
+            totalRewards.add(rewards);
+            list.add(rewards);
+        }
+        
+        // Add rewards to player
+        getPlayer().getInventory().addItems(totalRewards, change);
+        
+        // Set reward list as extra data for change info
+        change.setExtraData(list);
+        
+        // Complete
+        return change;
     }
     
     // Proto
