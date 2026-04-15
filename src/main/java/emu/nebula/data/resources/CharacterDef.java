@@ -31,7 +31,9 @@ public class CharacterDef extends BaseDef {
     
     private int[] GemSlots;
     
+    // Cached data
     private transient CharacterDesDef des;
+    private transient HonorDef honor;
     private transient ElementType elementType;
     private transient List<ChatDef> chats;
     
@@ -42,6 +44,10 @@ public class CharacterDef extends BaseDef {
     
     protected void setDes(CharacterDesDef des) {
         this.des = des;
+    }
+    
+    protected void setHonor(HonorDef honor) {
+        this.honor = honor;
     }
 
     public int getSkillsUpgradeGroup(int index) {

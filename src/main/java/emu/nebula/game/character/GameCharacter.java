@@ -30,6 +30,7 @@ import emu.nebula.proto.Public.AffinityInfo;
 import emu.nebula.proto.Public.Char;
 import emu.nebula.proto.Public.CharGemPreset;
 import emu.nebula.proto.Public.CharGemSlot;
+import emu.nebula.proto.Public.Honor;
 import emu.nebula.proto.Public.UI32;
 import emu.nebula.proto.PublicStarTower.StarTowerChar;
 import emu.nebula.proto.PublicStarTower.StarTowerCharGem;
@@ -411,7 +412,7 @@ public class GameCharacter implements GameDatabaseObject {
         return data != null ? data.getNeedExp() : 0;
     }
     
-    public void addAffinityExp(int amount) {
+    public void addAffinityExp(int amount, PlayerChangeInfo change) {
         // Setup
         int expRequired = this.getMaxAffinityExp();
 
@@ -420,10 +421,17 @@ public class GameCharacter implements GameDatabaseObject {
 
         // Check for level ups
         while (this.affinityExp >= expRequired && expRequired > 0) {
+            // Level up affinity and reset exp required
             this.affinityLevel += 1;
             this.affinityExp -= expRequired;
             
             expRequired = this.getMaxAffinityExp();
+            
+            // Add honor title if we meet the requirements
+            if (this.affinityLevel == GameConstants.AFFINITY_HONOR_UNLOCK_LEVEL && this.getData().getHonor() != null) {
+                var proto = Honor.newInstance().setNewId(this.getData().getHonor().getId());
+                change.add(proto);
+            }
         }
         
         // Clamp exp
@@ -472,14 +480,14 @@ public class GameCharacter implements GameDatabaseObject {
             return null;
         }
         
+        // Remove items
+        var change = this.getPlayer().getInventory().removeItems(items);
+        
         // Add affinity exp
-        this.addAffinityExp(exp);
+        this.addAffinityExp(exp, change);
         
         // Trigger quest/achievement
         this.getPlayer().trigger(QuestCondition.GiftGiveTotal, count);
-        
-        // Remove items
-        var change = this.getPlayer().getInventory().removeItems(items);
         
         // Success
         return change;

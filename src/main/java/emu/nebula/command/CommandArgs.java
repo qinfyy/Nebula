@@ -3,6 +3,7 @@ package emu.nebula.command;
 import java.util.List;
 
 import emu.nebula.Nebula;
+import emu.nebula.data.resources.AffinityLevelDef;
 import emu.nebula.game.character.GameCharacter;
 import emu.nebula.game.character.GameDisc;
 import emu.nebula.game.player.Player;
@@ -188,7 +189,7 @@ public class CommandArgs {
 
         if (this.getAffinity() >= 0) {
             int target = this.getAffinity();
-            if (target > 50) target = 50;
+            if (target > AffinityLevelDef.getMaxLevel()) target = AffinityLevelDef.getMaxLevel();
             if (target < 0) target = 0;
             if (character.getAffinityLevel() != target) {
                 character.setAffinityLevel(target);

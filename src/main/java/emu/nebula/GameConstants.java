@@ -26,7 +26,7 @@ public class GameConstants {
     public static final int JOINT_DRILL_TICKET_ID = 36;
     
     public static final int MAX_ENERGY = 240;
-    public static final int ENERGY_REGEN_TIME = 360; // Seconds
+    public static final int ENERGY_REGEN_TIME = 360; // Timeunit = Seconds
     
     public static final int CHARACTER_MAX_GEMS_PER_SLOT = 4;
     public static final int CHARACTER_MAX_GEM_PRESETS = 3;
@@ -35,6 +35,8 @@ public class GameConstants {
     public static final int CHARACTER_TAG_VANGUARD = 101;
     public static final int CHARACTER_TAG_VERSATILE = 102;
     public static final int CHARACTER_TAG_SUPPORT = 103;
+    
+    public static final int AFFINITY_HONOR_UNLOCK_LEVEL = 10;
     
     public static final int MAX_FORMATIONS = 6;
     public static final int MAX_SHOWCASE_IDS = 5;

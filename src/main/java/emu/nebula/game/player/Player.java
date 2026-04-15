@@ -936,7 +936,7 @@ public class Player implements GameDatabaseObject {
             proto.addHonors(info);
         }
         
-        this.getInventory().getHonorList().forEach(proto::addHonorList);
+        this.getInventory().getAllHonorTitles().forEach(proto::addHonorList);
         
         // Set world class
         proto.getMutableWorldClass()

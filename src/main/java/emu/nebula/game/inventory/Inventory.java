@@ -247,6 +247,32 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
         return true;
     }
     
+    public IntCollection getAllHonorTitles() {
+        // Setup int collection
+        var list = new IntOpenHashSet();
+        
+        // Add character honor titles
+        for (var character : getPlayer().getCharacters().getCharacterCollection()) {
+            // Check affinity level
+            if (character.getAffinityLevel() < GameConstants.AFFINITY_HONOR_UNLOCK_LEVEL) {
+                continue;
+            }
+            
+            // Get honor data
+            var honor = character.getData().getHonor();
+            if (honor == null) continue;
+            
+            // Add to honor list
+            list.add(honor.getId());
+        }
+        
+        // Finally, add extra honor titles
+        list.addAll(this.getHonorList());
+        
+        // Complete and return
+        return list;
+    }
+    
     public boolean addHonor(int id) {
         // Make sure we are not adding duplicates
         if (this.getHonorList().contains(id)) {
@@ -264,7 +290,27 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
     }
     
     public boolean hasHonor(int id) {
-        return id == GameConstants.DEFAULT_HONOR_ID || this.getHonorList().contains(id);
+        // Check if honor title is default or if the player owns it
+        if (id == GameConstants.DEFAULT_HONOR_ID || this.getHonorList().contains(id)) {
+            return true;
+        }
+        
+        // Get honor data
+        var honor = GameData.getHonorDataTable().get(id);
+        if (honor == null) return false;
+        
+        // Check if honor title is a trekker affinity title
+        if (honor.getType() == 2 && honor.getParams().length >= 1) {
+            int charId = honor.getParams()[0];
+            var character = this.getPlayer().getCharacters().getCharacterById(charId);
+            
+            if (character != null && character.getAffinityLevel() >= GameConstants.AFFINITY_HONOR_UNLOCK_LEVEL) {
+                return true;
+            }
+        }
+        
+        // Failure
+        return false;
     }
     
     // Resources
