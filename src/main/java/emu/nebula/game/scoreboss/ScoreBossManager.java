@@ -11,7 +11,8 @@ import emu.nebula.game.inventory.ItemParamMap;
 import emu.nebula.game.player.Player;
 import emu.nebula.game.player.PlayerChangeInfo;
 import emu.nebula.game.player.PlayerManager;
-
+import emu.nebula.server.error.ErrorCode;
+import emu.nebula.server.error.NebulaException;
 import lombok.Getter;
 
 @Getter
@@ -43,17 +44,17 @@ public class ScoreBossManager extends PlayerManager  {
         return this.ranking;
     }
     
-    public boolean apply(int levelId, long buildId) {
-        // Get level
+    public boolean apply(int levelId, long buildId) throws NebulaException {
+        // Get level from control data
         var control = getControlData();
         if (control == null || !control.getLevelGroup().contains(levelId)) {
-            return false;
+            throw new NebulaException(ErrorCode.SCORE_BOSS_NOT_AVAILABLE);
         }
         
         // Get build
         var build = this.getPlayer().getStarTowerManager().getBuildById(buildId);
         if (build == null) {
-            return false;
+            throw new NebulaException(ErrorCode.BUILD_NOT_EXIST);
         }
         
         // Set

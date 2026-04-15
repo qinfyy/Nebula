@@ -4,17 +4,17 @@ import lombok.Getter;
 import emu.nebula.proto.Public.Error;
 
 @Getter
-public class ServerException extends Exception {
+public class NebulaException extends Exception {
     private static final long serialVersionUID = -8953641375717705518L;
     private int code;
     private String[] args;
     
-    public ServerException(int code) {
-        this.code = code;
+    public NebulaException(ErrorCode code) {
+        this.code = code.getValue();
     }
     
-    public ServerException(int code, String... args) {
-        this.code = code;
+    public NebulaException(ErrorCode code, String... args) {
+        this.code = code.getValue();
         this.args = args;
     }
     

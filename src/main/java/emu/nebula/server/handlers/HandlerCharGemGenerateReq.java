@@ -4,7 +4,7 @@ import emu.nebula.net.NetHandler;
 import emu.nebula.net.NetMsgId;
 import emu.nebula.proto.CharGemGenerate.CharGemGenerateReq;
 import emu.nebula.proto.CharGemGenerate.CharGemGenerateResp;
-import emu.nebula.server.error.ServerException;
+import emu.nebula.server.error.NebulaException;
 import emu.nebula.net.HandlerId;
 import emu.nebula.game.character.CharacterGem;
 import emu.nebula.game.player.PlayerChangeInfo;
@@ -29,7 +29,7 @@ public class HandlerCharGemGenerateReq extends NetHandler {
         
         try {
             change = character.generateGem(req.getSlotId());
-        } catch (ServerException e) {
+        } catch (NebulaException e) {
             return session.encodeMsg(NetMsgId.char_gem_generate_failed_ack, e.toProto());
         }
         

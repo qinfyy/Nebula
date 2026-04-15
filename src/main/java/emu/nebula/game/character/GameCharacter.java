@@ -33,7 +33,8 @@ import emu.nebula.proto.Public.CharGemSlot;
 import emu.nebula.proto.Public.UI32;
 import emu.nebula.proto.PublicStarTower.StarTowerChar;
 import emu.nebula.proto.PublicStarTower.StarTowerCharGem;
-import emu.nebula.server.error.ServerException;
+import emu.nebula.server.error.ErrorCode;
+import emu.nebula.server.error.NebulaException;
 import emu.nebula.util.Bitset;
 import emu.nebula.util.ints.CustomIntArray;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -667,16 +668,16 @@ public class GameCharacter implements GameDatabaseObject {
         return true;
     }
 
-    public synchronized PlayerChangeInfo generateGem(int slotId) throws ServerException {
+    public synchronized PlayerChangeInfo generateGem(int slotId) throws NebulaException {
         // Get gem slot
         var slot = this.getGemSlot(slotId);
         if (slot == null) {
-            throw new ServerException(110105, "Emblem slot doesn't exist");
+            throw new NebulaException(ErrorCode.SERVER_ERROR, "Emblem slot doesn't exist");
         }
         
         // Skip if slot is full
         if (slot.isFull()) {
-            throw new ServerException(110105, "Emblem slots are full");
+            throw new NebulaException(ErrorCode.SERVER_ERROR, "Emblem slots are full");
         }
         
         // Get gem data
@@ -684,17 +685,17 @@ public class GameCharacter implements GameDatabaseObject {
         var gemControl = GameData.getCharGemSlotControlDataTable().get(slotId);
         
         if (gemControl == null) {
-            throw new ServerException(110105, "Emblem slot data doesn't exist");
+            throw new NebulaException(ErrorCode.SERVER_ERROR, "Emblem slot data doesn't exist");
         }
         
         // Check character level
         if (this.getLevel() < gemControl.getUnlockLevel()) {
-            throw new ServerException(110105, "Trekker needs to be at least level " + gemControl.getUnlockLevel());
+            throw new NebulaException(ErrorCode.SERVER_ERROR, "Trekker needs to be at least level " + gemControl.getUnlockLevel());
         }
         
         // Make sure the player has the materials to craft the emblem
         if (!getPlayer().getInventory().hasItem(gemData.getGenerateCostTid(), gemControl.getGeneratenCostQty())) {
-            throw new ServerException(119903);
+            throw new NebulaException(ErrorCode.INSUFFICIENT_RESOURCES);
         }
         
         // Generate attributes and create gem
@@ -718,11 +719,11 @@ public class GameCharacter implements GameDatabaseObject {
     }
     
     @SuppressWarnings("deprecation")
-    public synchronized PlayerChangeInfo refreshGem(int slotId, int gemIndex, RepeatedInt lockedAttributes) throws ServerException {
+    public synchronized PlayerChangeInfo refreshGem(int slotId, int gemIndex, RepeatedInt lockedAttributes) throws NebulaException {
         // Get gem from slot
         var gem = this.getGemFromSlot(slotId, gemIndex);
         if (gem == null) {
-            throw new ServerException(111609);
+            throw new NebulaException(ErrorCode.GEM_NOT_EXIST);
         }
         
         // Get gem data
@@ -730,17 +731,17 @@ public class GameCharacter implements GameDatabaseObject {
         var gemControl = GameData.getCharGemSlotControlDataTable().get(slotId);
         
         if (gemControl == null) {
-            throw new ServerException(110105, "Emblem slot data doesn't exist");
+            throw new NebulaException(ErrorCode.SERVER_ERROR, "Emblem slot data doesn't exist");
         }
         
         // Check character level
         if (this.getLevel() < gemControl.getUnlockLevel()) {
-            throw new ServerException(110105, "Trekker needs to be at least level " + gemControl.getUnlockLevel());
+            throw new NebulaException(ErrorCode.SERVER_ERROR, "Trekker needs to be at least level " + gemControl.getUnlockLevel());
         }
         
         // Get locked attributes
         if (lockedAttributes.length() > gemControl.getLockableNum()) {
-            throw new ServerException(110105, "You can only lock up to " + gemControl.getLockableNum() + " attributes");
+            throw new NebulaException(ErrorCode.SERVER_ERROR, "You can only lock up to " + gemControl.getLockableNum() + " attributes");
         }
         
         // Calculate the materials we need

@@ -4,7 +4,7 @@ import emu.nebula.net.NetHandler;
 import emu.nebula.net.NetMsgId;
 import emu.nebula.proto.CharGemRefresh.CharGemRefreshReq;
 import emu.nebula.proto.CharGemRefresh.CharGemRefreshResp;
-import emu.nebula.server.error.ServerException;
+import emu.nebula.server.error.NebulaException;
 import emu.nebula.net.HandlerId;
 import emu.nebula.game.character.CharacterGem;
 import emu.nebula.game.player.PlayerChangeInfo;
@@ -30,7 +30,7 @@ public class HandlerCharGemRefreshReq extends NetHandler {
         
         try {
             change = character.refreshGem(req.getSlotId(), req.getGemIndex(), req.getLockAttrs());
-        } catch (ServerException e) {
+        } catch (NebulaException e) {
             return session.encodeMsg(NetMsgId.char_gem_refresh_failed_ack, e.toProto());
         }
         
