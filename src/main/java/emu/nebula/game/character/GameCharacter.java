@@ -892,8 +892,10 @@ public class GameCharacter implements GameDatabaseObject {
             
             if (gem != null) {
                 info.addAllAttributes(gem.getAttributes());
+                info.addAllOverlockCount(new int[gem.getAttributes().length]);
             } else {
-                info.addAllAttributes(new int[] {0, 0, 0, 0});
+                info.addAllAttributes(new int[4]);
+                info.addAllOverlockCount(new int[4]);
             }
             
             proto.addGems(info);
