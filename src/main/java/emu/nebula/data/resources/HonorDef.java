@@ -20,6 +20,14 @@ public class HonorDef extends BaseDef {
     public int getId() {
         return Id;
     }
+
+    public boolean isCharacterHonor() {
+        return this.Type == 2 && this.Params.length > 0;
+    }
+    
+    public int getCharacterId() {
+        return this.Params[0];
+    }
     
     @Override
     public void onLoad() {

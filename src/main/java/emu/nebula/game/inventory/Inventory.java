@@ -300,8 +300,8 @@ public class Inventory extends PlayerManager implements GameDatabaseObject {
         if (honor == null) return false;
         
         // Check if honor title is a trekker affinity title
-        if (honor.getType() == 2 && honor.getParams().length >= 1) {
-            int charId = honor.getParams()[0];
+        if (honor.isCharacterHonor()) {
+            int charId = honor.getCharacterId();
             var character = this.getPlayer().getCharacters().getCharacterById(charId);
             
             if (character != null && character.getAffinityLevel() >= GameConstants.AFFINITY_HONOR_UNLOCK_LEVEL) {

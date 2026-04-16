@@ -7,7 +7,7 @@ import java.util.Map;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
-
+import emu.nebula.data.GameData;
 import emu.nebula.database.GameDatabaseObject;
 import emu.nebula.game.player.Player;
 import emu.nebula.game.tower.StarTowerBuild;
@@ -33,6 +33,7 @@ public class ScoreBossRankEntry implements GameDatabaseObject {
     private int titlePrefix;
     private int titleSuffix;
     private int[] honor;
+    private int[] honorAff;
     private int score;
     @SuppressWarnings("unused")
     private int stars;
@@ -81,6 +82,19 @@ public class ScoreBossRankEntry implements GameDatabaseObject {
         this.titlePrefix = player.getTitlePrefix();
         this.titleSuffix = player.getTitleSuffix();
         this.honor = player.getHonor();
+        this.honorAff = new int[this.honor.length];
+        
+        for (int i = 0; i < this.honor.length; i++) {
+            var honor = GameData.getHonorDataTable().get(this.honor[i]);
+            if (honor == null || !honor.isCharacterHonor()) {
+                continue;
+            }
+            
+            var character = player.getCharacters().getCharacterById(honor.getCharacterId());
+            if (character != null) {
+                this.honorAff[i] = character.getAffinityLevel();
+            }
+        }
     }
     
     public void settle(Player player, StarTowerBuild build, int controlId, int level, int stars, int score, int skillScore) {
@@ -129,8 +143,19 @@ public class ScoreBossRankEntry implements GameDatabaseObject {
                 .setTitleSuffix(this.getTitleSuffix())
                 .setRank(this.getRank());
         
-        for (int id : this.getHonor()) {
-            proto.addHonors(HonorInfo.newInstance().setId(id));
+        for (int i = 0; i < this.getHonor().length; i++) {
+            int honorId = this.getHonor()[i];
+            int affinityLevel = 0;
+            
+            if (this.getHonorAff() != null && i < this.getHonorAff().length) {
+                affinityLevel = this.getHonorAff()[i];
+            }
+            
+            var info = HonorInfo.newInstance()
+                    .setId(honorId)
+                    .setAffinityLV(affinityLevel);
+            
+            proto.addHonors(info);
         }
         
         for (var entry : this.getTeams().entrySet()) {
