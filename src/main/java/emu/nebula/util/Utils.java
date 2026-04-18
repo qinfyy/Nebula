@@ -169,6 +169,10 @@ public class Utils {
         return (int) sum;
     }
 
+    public static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(\\.\\d+)?");
+    }
+    
     public static double generateRandomDouble() {
         return ThreadLocalRandom.current().nextDouble();
     }

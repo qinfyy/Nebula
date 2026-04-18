@@ -14,7 +14,6 @@ import emu.nebula.game.character.GameDisc;
 import emu.nebula.game.inventory.ItemParamMap;
 import emu.nebula.net.NetMsgId;
 import emu.nebula.util.Utils;
-
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 @Command(
@@ -40,16 +39,19 @@ public class AutoBuildCommand implements CommandHandler {
             int id = Utils.parseSafeInt(arg);
             int count = 1;
             
-            builder.parseItem(id, count);
+            if (id != 0) {
+                builder.parseItem(id, count);
+            } else if (!Utils.isNumeric(arg)) {
+                // Might be a preset code
+                var items = args.parsePresetCode(arg);
+                if (items != null) {
+                    builder.parseItems(items);
+                }
+            }
         }
         
         if (args.getMap() != null) {
-            for (var entry : args.getMap().int2IntEntrySet()) {
-                int id = entry.getIntKey();
-                int count = entry.getIntValue();
-                
-                builder.parseItem(id, count);
-            }
+            builder.parseItems(args.getMap());
         }
         
         // Remove extra characters/discs
@@ -104,8 +106,27 @@ public class AutoBuildCommand implements CommandHandler {
             }
         }
         
+        // Calcluate score
+        builder.toBuild();
+        
         // Pick random potentials and sub notes
-        this.generate(builder, targetScore);
+        boolean shouldGenerateNotes = !args.hasFlag("-nn") && !args.hasFlag("-nonotes");
+        boolean shouldGeneratePotentials = !args.hasFlag("-np") && !args.hasFlag("-nopotentials") ;
+        
+        if (shouldGenerateNotes) {
+            int score = Math.max(targetScore - builder.getBuild().getScore(), 0);
+            
+            if (shouldGeneratePotentials) {
+                score = (int) (score * .4D);
+            }
+            
+            this.generateSubNotes(builder, score);
+        }
+        
+        if (shouldGeneratePotentials) {
+            int score = Math.max(targetScore - builder.getBuild().getScore(), 0);
+            this.generatePotentials(builder, score);
+        }
         
         // Create record
         var build = builder.toBuild();
@@ -246,10 +267,7 @@ public class AutoBuildCommand implements CommandHandler {
         builder.getDiscs().add(list.get(0));
     }
         
-    private void generate(StarTowerBuildData builder, int targetScore) {
-        // Get possible sub notes
-        int subNoteScore = (int) (targetScore * .4D);
-        
+    private void generateSubNotes(StarTowerBuildData builder, int subNoteScore) {
         // Get possible drops
         var drops = new IntArrayList();
         
@@ -343,11 +361,10 @@ public class AutoBuildCommand implements CommandHandler {
         }
         
         // Calcluate score
-        builder.toBuild().calculateScore();
-        
-        // Get target potential score
-        int potentialScore = Math.max(targetScore - builder.getBuild().getScore(), 0);
-        
+        builder.toBuild();
+    }
+    
+    private void generatePotentials(StarTowerBuildData builder, int potentialScore) {
         // Init weighted list of characters
         var characters = new ArrayList<GameCharacter>();
         

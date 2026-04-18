@@ -13,6 +13,7 @@ import emu.nebula.game.player.Player;
 import emu.nebula.game.tower.StarTowerBuild;
 import emu.nebula.net.NetMsgId;
 import emu.nebula.util.Utils;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import lombok.Getter;
 
 @Command(
@@ -35,16 +36,19 @@ public class BuildCommand implements CommandHandler {
             int id = Utils.parseSafeInt(arg);
             int count = 1;
             
-            builder.parseItem(id, count);
+            if (id != 0) {
+                builder.parseItem(id, count);
+            } else if (!Utils.isNumeric(arg)) {
+                // Might be a preset code
+                var items = args.parsePresetCode(arg);
+                if (items != null) {
+                    builder.parseItems(items);
+                }
+            }
         }
         
         if (args.getMap() != null) {
-            for (var entry : args.getMap().int2IntEntrySet()) {
-                int id = entry.getIntKey();
-                int count = entry.getIntValue();
-                
-                builder.parseItem(id, count);
-            }
+            builder.parseItems(args.getMap());
         }
         
         // Check if build is valid
@@ -133,6 +137,15 @@ public class BuildCommand implements CommandHandler {
             }
         }
         
+        public void parseItems(Int2IntMap items) {
+            for (var entry : items.int2IntEntrySet()) {
+                int id = entry.getIntKey();
+                int count = entry.getIntValue();
+                
+                this.parseItem(id, count);
+            }
+        }
+        
         public void addCharacter(GameCharacter character) {
             if (this.characters.contains(character)) {
                 return;
@@ -174,6 +187,9 @@ public class BuildCommand implements CommandHandler {
                 
                 build.getCharPots().add(data.getCharId(), 1);
             }
+            
+            // Reset secondary skills
+            build.refreshSecondarySkills();
             
             // Calculate score
             build.calculateScore();

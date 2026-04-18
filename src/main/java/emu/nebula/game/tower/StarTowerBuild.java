@@ -134,6 +134,10 @@ public class StarTowerBuild implements GameDatabaseObject {
         this.preference = state;
         Nebula.getGameDatabase().update(this, this.getUid(), "preference", this.isPreference());
     }
+
+    public void refreshSecondarySkills() {
+        this.secondarySkills = SecondarySkillDef.calculateSecondarySkills(this.getDiscIds(), this.getSubNoteSkills());
+    }
     
     // Score
     
@@ -161,7 +165,7 @@ public class StarTowerBuild implements GameDatabaseObject {
         
         // Check secondary skills
         if (this.getSecondarySkills() == null) {
-            this.secondarySkills = SecondarySkillDef.calculateSecondarySkills(this.getDiscIds(), this.getSubNoteSkills());
+            this.refreshSecondarySkills();
         }
         
         // Add score from secondary skills

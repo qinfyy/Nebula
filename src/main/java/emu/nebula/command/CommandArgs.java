@@ -1,8 +1,11 @@
 package emu.nebula.command;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 
 import emu.nebula.Nebula;
+import emu.nebula.data.GameData;
 import emu.nebula.data.resources.AffinityLevelDef;
 import emu.nebula.game.character.GameCharacter;
 import emu.nebula.game.character.GameDisc;
@@ -10,6 +13,7 @@ import emu.nebula.game.player.Player;
 import emu.nebula.util.Utils;
 import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import lombok.Getter;
@@ -234,5 +238,121 @@ public class CommandArgs {
         }
         
         return hasChanged;
+    }
+    
+    /**
+     * Converts a preset code back into a map of ids
+     * @param code
+     * @return
+     */
+    public Int2IntMap parsePresetCode(String code) {
+        // Init map
+        var items = new Int2IntOpenHashMap();
+        
+        // Decode preset data from base64
+        byte[] data = Utils.base64Decode(code);
+        
+        var preset = ByteBuffer.wrap(data);
+        preset.order(ByteOrder.BIG_ENDIAN);
+        
+        // Parse character ids
+        int[] charIds = new int[3];
+        try {
+            for (int i = 0; i < 3; i++) {
+                int id = preset.getInt();
+                
+                charIds[i] = id;
+                items.put(id, 1);
+            }
+        } catch (Exception e) {
+            // Ignored
+            return null;
+        }
+        
+        // Parse potentials
+        try {
+            for (int i = 0; i < 3; i++) {
+                int charId = charIds[i];
+                
+                // Get potential data
+                var potentials = GameData.getCharPotentialDataTable().get(charId);
+                if (potentials == null) {
+                    return null;
+                }
+                
+                // Setup potentials
+                int[] specificPotentialIds;
+                int[] normalPotentialIds;
+                int[] commonPotentialIds = potentials.getCommonPotentialIds();
+                
+                // Check if main trekker or not
+                if (i == 1) {
+                    specificPotentialIds = potentials.getMasterSpecificPotentialIds();
+                    normalPotentialIds = potentials.getMasterNormalPotentialIds();
+                } else {
+                    specificPotentialIds = potentials.getAssistSpecificPotentialIds();
+                    normalPotentialIds = potentials.getAssistNormalPotentialIds();
+                }
+                
+                // Parser
+                int size = (int) Math.ceil((specificPotentialIds.length + (normalPotentialIds.length * 3) + (commonPotentialIds.length * 3)) / 8D);
+                byte[] potentialBytes = new byte[size];
+                preset.get(potentialBytes);
+                var potentialData = new BitReader(potentialBytes);
+                
+                // Calculate levels of potentials
+                for (int id : specificPotentialIds) {
+                    int level = potentialData.readBits(1);
+                    if (level > 0) {
+                        items.put(id, level);
+                    }
+                }
+                
+                for (int id : normalPotentialIds) {
+                    int level = potentialData.readBits(3);
+                    if (level > 0) {
+                        items.put(id, level);
+                    }
+                }
+                
+                for (int id : commonPotentialIds) {
+                    int level = potentialData.readBits(3);
+                    if (level > 0) {
+                        items.put(id, level);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Ignored
+            return null;
+        }
+        
+        // Finished
+        return items;
+    }
+    
+    @Getter
+    private static class BitReader {
+        private byte[] bits;
+        private int arrayIndex;
+        private int bitIndex;
+        
+        public BitReader(byte[] bits) {
+            this.bits = bits;
+        }
+        
+        public int readBits(int count) {
+            int result = 0;
+            for (int i = 0; i < count; i++) {
+                result <<= 1;
+                result |= (this.bits[arrayIndex] >> (7 - bitIndex)) & 1;
+                bitIndex++;
+                if (bitIndex >= 8) {
+                    bitIndex = 0;
+                    arrayIndex++;
+                }
+            }
+            return result;
+        }
     }
 }
