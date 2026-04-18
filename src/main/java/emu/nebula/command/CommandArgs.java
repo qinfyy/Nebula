@@ -13,7 +13,6 @@ import emu.nebula.game.player.Player;
 import emu.nebula.util.Utils;
 import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import lombok.Getter;
@@ -247,7 +246,7 @@ public class CommandArgs {
      */
     public Int2IntMap parsePresetCode(String code) {
         // Init map
-        var items = new Int2IntOpenHashMap();
+        var items = new Int2IntLinkedOpenHashMap();
         
         // Decode preset data from base64
         byte[] data = Utils.base64Decode(code);
