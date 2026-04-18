@@ -58,7 +58,7 @@ public class FormationManager extends PlayerManager implements GameDatabaseObjec
         // TODO
         
         // Create formation
-        var formation = new Formation(info);
+        var formation = new Formation(this.getPlayer(), info);
         
         // Add to formations map
         this.formations.put(formation.getNum(), formation);

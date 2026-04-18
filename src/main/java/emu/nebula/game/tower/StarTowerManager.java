@@ -1,5 +1,6 @@
 package emu.nebula.game.tower;
 
+import emu.nebula.GameConstants;
 import emu.nebula.Nebula;
 import emu.nebula.data.GameData;
 import emu.nebula.data.resources.StarTowerGrowthNodeDef;
@@ -9,6 +10,7 @@ import emu.nebula.game.player.PlayerChangeInfo;
 import emu.nebula.game.player.PlayerManager;
 import emu.nebula.game.player.PlayerProgress;
 import emu.nebula.game.quest.QuestCondition;
+import emu.nebula.proto.PublicStarTower.StarTowerBookCharPotential;
 import emu.nebula.proto.StarTowerApply.StarTowerApplyReq;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -20,12 +22,15 @@ import lombok.Getter;
 
 @Getter
 public class StarTowerManager extends PlayerManager {
-    // Tower game instance
+    // Star tower game instance
     private StarTowerGame game;
     
-    // Tower builds
+    // Star tower records
     private Long2ObjectMap<StarTowerBuild> builds;
     private StarTowerBuild lastBuild;
+    
+    // Potential presets
+    private Long2ObjectMap<StarTowerPotentialPreset> presets;
     
     public StarTowerManager(Player player) {
         super(player);
@@ -155,7 +160,7 @@ public class StarTowerManager extends PlayerManager {
             this.loadFromDatabase();
         }
         
-        return builds;
+        return this.builds;
     }
     
     public StarTowerBuild getBuildById(long id) {
@@ -206,7 +211,7 @@ public class StarTowerManager extends PlayerManager {
         }
         
         // Check limit
-        if (this.getBuilds().size() >= 50) {
+        if (this.getBuilds().size() >= GameConstants.MAX_BUILDS) {
             return null;
         }
         
@@ -256,6 +261,63 @@ public class StarTowerManager extends PlayerManager {
         
         // Success
         return change;
+    }
+    
+    // Presets
+    
+    public Long2ObjectMap<StarTowerPotentialPreset> getPresets() {
+        if (this.presets == null) {
+            this.loadFromDatabase();
+        }
+        
+        return this.presets;
+    }
+    
+    public StarTowerPotentialPreset getPresetById(long presetId) {
+        return this.getPresets().get(presetId);
+    }
+    
+    public StarTowerPotentialPreset importPreset(String name, boolean preference, Iterable<StarTowerBookCharPotential> potentials) {
+        // Check max presets limit
+        if (this.getPresets().size() >= GameConstants.MAX_PRESETS) {
+            return null;
+        }
+        
+        // Check name
+        if (name == null) {
+            name = "";
+        }
+        
+        // Clamp name if it's too long
+        if (name.length() > 32) {
+            name = name.substring(0, 31);
+        }
+        
+        // Create preset
+        var preset = new StarTowerPotentialPreset(this.getPlayer(), name, preference, potentials);
+        
+        // Save to database
+        preset.save();
+        
+        // Add to map
+        this.getPresets().put(preset.getUid(), preset);
+        
+        // Return preset
+        return preset;
+    }
+    
+    public boolean deletePreset(StarTowerPotentialPreset preset) {
+        // Get preset
+        var removed = this.getPresets().remove(preset.getUid());
+        if (removed == null) {
+            return false;
+        }
+        
+        // Delete from database
+        removed.delete();
+        
+        // Success
+        return true;
     }
     
     // Game
@@ -401,8 +463,9 @@ public class StarTowerManager extends PlayerManager {
     // Database
     
     public void loadFromDatabase() {
-        // Init builds
+        // Init variables
         this.builds = new Long2ObjectOpenHashMap<>();
+        this.presets = new Long2ObjectOpenHashMap<>();
         
         // Load builds with the current player's uid
         Nebula.getGameDatabase().getObjects(StarTowerBuild.class, "playerUid", getPlayerUid()).forEach(build -> {
@@ -414,6 +477,12 @@ public class StarTowerManager extends PlayerManager {
             
             // Add build
             this.builds.put(build.getUid(), build);
+        });
+        
+        // Load presets with the current player's uid
+        Nebula.getGameDatabase().getObjects(StarTowerPotentialPreset.class, "playerUid", getPlayerUid()).forEach(preset -> {
+            // Add preset
+            this.presets.put(preset.getUid(), preset);
         });
     }
 }

@@ -14,6 +14,12 @@ public class HandlerPotentialPreselectionListReq extends NetHandler {
         // Create base response
         var rsp = PotentialPreselectionList.newInstance();
         
+        // Add potential presets
+        var presets = session.getPlayer().getStarTowerManager().getPresets().values();
+        for (var preset : presets) {
+            rsp.addList(preset.toProto());
+        }
+        
         // Encode and send
         return session.encodeMsg(NetMsgId.potential_preselection_list_succeed_ack, rsp);
     }

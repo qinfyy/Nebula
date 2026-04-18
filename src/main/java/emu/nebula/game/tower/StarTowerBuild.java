@@ -49,7 +49,7 @@ public class StarTowerBuild implements GameDatabaseObject {
     
     @Deprecated
     public StarTowerBuild() {
-        
+        // Morphia only
     }
     
     public StarTowerBuild(Player player) {
@@ -104,6 +104,7 @@ public class StarTowerBuild implements GameDatabaseObject {
     }
 
     public void setName(String newName) {
+        // Clamp name length to prevent long names
         if (newName.length() > 32) {
             newName = newName.substring(0, 31);
         }
@@ -113,11 +114,23 @@ public class StarTowerBuild implements GameDatabaseObject {
     }
     
     public void setLock(boolean state) {
+        // Skip if no change detected
+        if (this.lock == state) {
+            return;
+        }
+        
+        // Set locked state
         this.lock = state;
         Nebula.getGameDatabase().update(this, this.getUid(), "lock", this.isLock());
     }
     
     public void setPreference(boolean state) {
+        // Skip if no change detected
+        if (this.preference == state) {
+            return;
+        }
+        
+        // Set preference (favorite toggle)
         this.preference = state;
         Nebula.getGameDatabase().update(this, this.getUid(), "preference", this.isPreference());
     }
