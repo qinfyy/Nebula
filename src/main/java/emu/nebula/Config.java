@@ -174,7 +174,8 @@ public class Config {
                 new ItemParam(86009, 1),
                 new ItemParam(86002, 1),
                 new ItemParam(1, 1_000_000),
-                new ItemParam(2, 30_000));
+                new ItemParam(2, 30_000)
+            );
         }
     }
 

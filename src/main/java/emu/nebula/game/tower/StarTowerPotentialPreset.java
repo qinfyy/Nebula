@@ -80,7 +80,7 @@ public class StarTowerPotentialPreset implements GameDatabaseObject {
                 // Validate
                 var data = GameData.getPotentialDataTable().get(potential.getId());
                 if (data == null || data.getCharId() != data.getCharId()) {
-                    return;
+                    continue;
                 }
                 
                 // Check level

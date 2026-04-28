@@ -68,11 +68,10 @@ public class GameConstants {
     static {
         DAILY_SHOP_GIFTS.add(1000, new ItemParam(GOLD_ITEM_ID, 8888));
         DAILY_SHOP_GIFTS.add(250, new ItemParam(GOLD_ITEM_ID, 18888));
+        DAILY_SHOP_GIFTS.add(100, new ItemParam(GOLD_ITEM_ID, 28888));
         DAILY_SHOP_GIFTS.add(250, new ItemParam(33001, 10));
         DAILY_SHOP_GIFTS.add(10, new ItemParam(GEM_ITEM_ID, 50)); // Custom
         
-        DAILY_MALL_GIFTS.add(100, ItemParamMap.of(GOLD_ITEM_ID, 25_000, 82001, 5));
-        DAILY_MALL_GIFTS.add(100, ItemParamMap.of(GOLD_ITEM_ID, 25_000, 82004, 5));
         DAILY_MALL_GIFTS.add(100, ItemParamMap.of(GOLD_ITEM_ID, 25_000, 82007, 5));
     }
     
