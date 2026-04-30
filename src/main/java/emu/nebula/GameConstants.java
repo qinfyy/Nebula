@@ -44,7 +44,7 @@ public class GameConstants {
     public static final int MAX_BUILDS = 100;
     public static final int MAX_PRESETS = 50;
     
-    public static final int BATTLE_PASS_ID = 1;
+    public static final int BATTLE_PASS_ID = 7;
     
     public static final int MAX_FRIENDSHIPS = 50;
     public static final int MAX_PENDING_FRIENDSHIPS = 30;
