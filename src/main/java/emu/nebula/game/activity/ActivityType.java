@@ -25,7 +25,8 @@ public enum ActivityType {
     Story         (17),
     PenguinCard   (18),
     ThrowGift     (19),
-    GoldenSpy     (20);
+    GoldenSpy     (20),
+    Double        (21);
 
     @Getter
     private final int value;
